@@ -24,7 +24,7 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @ComponentScan(basePackages = {"org.activiti.cloud.services.query.elastic.model"})
 public class ElasticConfiguration {
 
-    private static Logger logger = LoggerFactory.getLogger(ElasticConfiguration.class);
+    private static Logger logger = LoggerFactory.getLogger(ElasticConfiguration.class); 
 
     @Value("${elasticsearch.home:/Users/wzhou/Downloads/elasticsearch-5.5.0}")
     private String elasticsearchHome;
