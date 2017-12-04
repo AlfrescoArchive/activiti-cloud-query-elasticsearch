@@ -7,7 +7,7 @@
     <version>7-201712-EA-SNAPSHOT</version>
   </parent>
 
-  <artifactId>activiti-cloud-starter-query</artifactId>
+  <artifactId>activiti-cloud-starter-query-elastic</artifactId>
   <name>Activiti Cloud Starter :: Query</name>
   <dependencies>
     <dependency>

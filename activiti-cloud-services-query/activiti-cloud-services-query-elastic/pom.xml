@@ -3,59 +3,16 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.activiti.cloud</groupId>
-		<artifactId>activiti-cloud-services-query</artifactId>
-		<version>7-201711-EA-SNAPSHOT</version>
-	</parent>
+        <groupId>org.activiti.cloud</groupId>
+        <artifactId>activiti-cloud-services-query</artifactId>
+        <version>7-201712-EA-SNAPSHOT</version>
+    </parent>
 
 	<artifactId>activiti-cloud-services-query-elastic</artifactId>
 	<name>Activiti - Services :: Query Elasticsearch</name>
 	<description>Activiti Services Query Elasticsearch</description>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.activiti.cloud</groupId>
-			<artifactId>activiti-cloud-services-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.activiti.cloud</groupId>
-			<artifactId>activiti-cloud-services-identity-keycloak</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.activiti.cloud</groupId>
-			<artifactId>activiti-cloud-services-query-model</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-commons</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.querydsl</groupId>
-			<artifactId>querydsl-apt</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.querydsl</groupId>
-			<artifactId>querydsl-core</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>com.querydsl</groupId>
-			<artifactId>querydsl-jpa</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-configuration-processor</artifactId>
-			<optional>true</optional>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -68,7 +25,6 @@
 			<artifactId>h2</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 
 		<dependency>
 			<groupId>org.activiti.cloud</groupId>
@@ -152,7 +108,7 @@
 		</dependency>
 		<dependency>
 			<groupId>com.querydsl</groupId>
-			<artifactId>querydsl-mongodb</artifactId>
+			<artifactId>querydsl-elasticsearch</artifactId>
 		</dependency>
 
 		<!-- Test dependencies -->
@@ -187,6 +143,5 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
-
 
 </project>

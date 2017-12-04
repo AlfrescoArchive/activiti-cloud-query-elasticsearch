@@ -7,25 +7,20 @@
     <version>7-201712-EA-SNAPSHOT</version>
   </parent>
 
-  <artifactId>activiti-cloud-audit-service-parent</artifactId>
-  <name>Activiti Cloud - Audit Services :: Parent</name>
-  <description>Activiti Cloud Audit Services Parent</description>
+  <artifactId>activiti-cloud-query-service-parent</artifactId>
+  <name>Activiti Cloud - Query Services :: Parent</name>
+  <description>Activiti Cloud Query Services Parent</description>
   <version>7-201712-EA-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <properties>
-    <!--
-    Override property from activiti-cloud-parent that's set to the default snapshot version.
-    This allow to easily create feature branches with a different Maven version.
-    -->
-    <version.activiti.cloud.audit>${project.version}</version.activiti.cloud.audit>
-  </properties>
-
   <modules>
-    <module>activiti-cloud-services-audit</module>
-    <module>activiti-cloud-starter-audit</module>
-    <module>activiti-cloud-starter-audit-mongo</module>
+    <module>activiti-cloud-services-query-elastic</module>
+    <module>activiti-cloud-starter-query-elastic</module>
   </modules>
+
+  <properties>
+    <version.activiti.cloud.query>${project.version}</version.activiti.cloud.query>
+  </properties>
 
   <repositories>
     <repository>
@@ -119,5 +114,4 @@
       <organizationUrl>http://alfresco.com</organizationUrl>
     </developer>
   </developers>
-
 </project>
