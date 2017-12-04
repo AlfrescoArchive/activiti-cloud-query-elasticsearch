@@ -26,7 +26,11 @@ import org.springframework.data.rest.core.annotation.RestResource;
 @RepositoryRestResource(exported = false)
 public interface ProcessInstanceRepository extends ElasticsearchRepository<ProcessInstance, Long>
 {
-    @RestResource(exported = false)
+/* Call elastic basic APIs here...*/
+
+
+/*NOT REQUIRED*/
+   /* @RestResource(exported = false)
     List<ProcessInstance> findProcessInstances();
 
     @RestResource(exported = false)
@@ -39,5 +43,5 @@ public interface ProcessInstanceRepository extends ElasticsearchRepository<Proce
     List<ProcessInstance> findRunningProcessInstances();
     
     @RestResource(exported = false)
-    List<ProcessInstance> findCompletedProcessInstances();
+    List<ProcessInstance> findCompletedProcessInstances();*/
 }
