@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Alfresco, Inc. and/or its affiliates.
+ * Copyright 2018 Alfresco, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 package org.activiti.cloud.services.query.rest.config;
 
-import org.activiti.cloud.services.query.model.ProcessInstance;
-import org.activiti.cloud.services.query.model.Task;
-import org.activiti.cloud.services.query.model.Variable;
+import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
+import org.activiti.cloud.services.query.model.TaskEntity;
+import org.activiti.cloud.services.query.model.VariableEntity;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.mapping.RepositoryDetectionStrategy.RepositoryDetectionStrategies;
@@ -29,16 +29,14 @@ public class QueryRepositoryConfig extends RepositoryRestConfigurerAdapter {
 
     @Override
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
-    	// Configure base path for api endpoint
-    	config.setBasePath("/v1");
     	
     	// Expose only repositories annotated with @RepositoryRestResource
     	config.setRepositoryDetectionStrategy(RepositoryDetectionStrategies.ANNOTATED);
     	
         //by default the ids are not exposed the the REST API
-        config.exposeIdsFor(ProcessInstance.class);
-        config.exposeIdsFor(Task.class);
-        config.exposeIdsFor(Variable.class);
+        config.exposeIdsFor(ProcessInstanceEntity.class);
+        config.exposeIdsFor(TaskEntity.class);
+        config.exposeIdsFor(VariableEntity.class);
     }
 
 }

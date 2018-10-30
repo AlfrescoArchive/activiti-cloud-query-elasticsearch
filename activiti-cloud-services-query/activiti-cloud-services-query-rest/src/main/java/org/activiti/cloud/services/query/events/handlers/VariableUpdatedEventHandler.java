@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Alfresco, Inc. and/or its affiliates.
+ * Copyright 2018 Alfresco, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,47 +18,53 @@ package org.activiti.cloud.services.query.events.handlers;
 
 import java.util.Date;
 
-import org.activiti.cloud.services.api.events.ProcessEngineEvent;
-import org.activiti.cloud.services.query.model.Variable;
-import org.activiti.cloud.services.query.events.VariableUpdatedEvent;
+import org.activiti.api.model.shared.event.VariableEvent;
+import org.activiti.cloud.api.model.shared.events.CloudRuntimeEvent;
+import org.activiti.cloud.api.model.shared.events.CloudVariableUpdatedEvent;
+import org.activiti.cloud.services.query.model.VariableEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class VariableUpdatedEventHandler implements QueryEventHandler {
 
-    private ProcessVariableUpdateHandler processVariableUpdateHandler;
+    private ProcessVariableUpdateEventHandler processVariableUpdateEventHandler;
 
-    private TaskVariableUpdatedHandler taskVariableUpdatedHandler;
+    private TaskVariableUpdatedEventHandler taskVariableUpdatedEventHandler;
 
     @Autowired
-    public VariableUpdatedEventHandler(ProcessVariableUpdateHandler processVariableUpdateHandler,
-                                       TaskVariableUpdatedHandler taskVariableUpdatedHandler) {
-        this.processVariableUpdateHandler = processVariableUpdateHandler;
-        this.taskVariableUpdatedHandler = taskVariableUpdatedHandler;
+    public VariableUpdatedEventHandler(ProcessVariableUpdateEventHandler processVariableUpdateEventHandler,
+                                       TaskVariableUpdatedEventHandler taskVariableUpdatedEventHandler) {
+        this.processVariableUpdateEventHandler = processVariableUpdateEventHandler;
+        this.taskVariableUpdatedEventHandler = taskVariableUpdatedEventHandler;
     }
 
     @Override
-    public void handle(ProcessEngineEvent event) {
-        VariableUpdatedEvent variableUpdatedEvent = (VariableUpdatedEvent) event;
-        Variable variable = new Variable(variableUpdatedEvent.getVariableType(),
-                                         variableUpdatedEvent.getVariableName(),
-                                         variableUpdatedEvent.getProcessInstanceId(),
-                                         variableUpdatedEvent.getTaskId(),
-                                         new Date(variableUpdatedEvent.getTimestamp()),
-                                         new Date(variableUpdatedEvent.getTimestamp()),
-                                         variableUpdatedEvent.getExecutionId(),
-                                         variableUpdatedEvent.getVariableValue());
-        if (variableUpdatedEvent.getTaskId() != null) {
-            taskVariableUpdatedHandler.handle(variable);
+    public void handle(CloudRuntimeEvent<?, ?> event) {
+        CloudVariableUpdatedEvent variableUpdatedEvent = (CloudVariableUpdatedEvent) event;
+        VariableEntity variableEntity = new VariableEntity(null,
+        		                                           variableUpdatedEvent.getEntity().getType(),
+                                                           variableUpdatedEvent.getEntity().getName(),
+                                                           variableUpdatedEvent.getEntity().getProcessInstanceId(),
+                                                           variableUpdatedEvent.getServiceName(),
+                                                           variableUpdatedEvent.getServiceFullName(),
+                                                           variableUpdatedEvent.getServiceVersion(),
+                                                           variableUpdatedEvent.getAppName(),
+                                                           variableUpdatedEvent.getAppVersion(),
+                                                           variableUpdatedEvent.getEntity().getTaskId(),
+                                                           new Date(variableUpdatedEvent.getTimestamp()),
+                                                           new Date(variableUpdatedEvent.getTimestamp()),
+                                                           null);
+        variableEntity.setValue(variableUpdatedEvent.getEntity().getValue());
+        if (variableUpdatedEvent.getEntity().isTaskVariable()) {
+            taskVariableUpdatedEventHandler.handle(variableEntity);
         } else {
-            processVariableUpdateHandler.handle(variable);
+            processVariableUpdateEventHandler.handle(variableEntity);
         }
-
     }
 
     @Override
-    public Class<? extends ProcessEngineEvent> getHandledEventClass() {
-        return VariableUpdatedEvent.class;
+    public String getHandledEvent() {
+        return VariableEvent.VariableEvents.VARIABLE_UPDATED.name();
     }
 }

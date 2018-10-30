@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Alfresco, Inc. and/or its affiliates.
+ * Copyright 2018 Alfresco, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,38 +16,38 @@
 
 package org.activiti.cloud.services.query.events.handlers;
 
-import org.activiti.cloud.services.api.events.ProcessEngineEvent;
-import org.activiti.cloud.services.query.events.VariableDeletedEvent;
+import org.activiti.api.model.shared.event.VariableEvent;
+import org.activiti.cloud.api.model.shared.events.CloudRuntimeEvent;
+import org.activiti.cloud.api.model.shared.events.CloudVariableDeletedEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class VariableDeletedEventHandler implements QueryEventHandler {
 
-    private final ProcessVariableDeletedHandler processVariableDeletedHandler;
+    private final ProcessVariableDeletedEventHandler processVariableDeletedHandler;
 
-    private final TaskVariableDeletedHandler taskVariableDeletedHandler;
+    private final TaskVariableDeletedEventHandler taskVariableDeletedEventHandler;
 
     @Autowired
-    public VariableDeletedEventHandler(ProcessVariableDeletedHandler processVariableDeletedHandler,
-                                       TaskVariableDeletedHandler taskVariableDeletedHandler) {
+    public VariableDeletedEventHandler(ProcessVariableDeletedEventHandler processVariableDeletedHandler,
+                                       TaskVariableDeletedEventHandler taskVariableDeletedEventHandler) {
         this.processVariableDeletedHandler = processVariableDeletedHandler;
-        this.taskVariableDeletedHandler = taskVariableDeletedHandler;
+        this.taskVariableDeletedEventHandler = taskVariableDeletedEventHandler;
     }
 
     @Override
-    public void handle(ProcessEngineEvent event) {
-        VariableDeletedEvent variableDeletedEvent = (VariableDeletedEvent) event;
-        if (variableDeletedEvent.getTaskId() == null) {
-            processVariableDeletedHandler.handle(variableDeletedEvent);
+    public void handle(CloudRuntimeEvent<?, ?> event) {
+        CloudVariableDeletedEvent variableDeletedEvent = (CloudVariableDeletedEvent) event;
+        if (variableDeletedEvent.getEntity().isTaskVariable()) {
+            taskVariableDeletedEventHandler.handle(variableDeletedEvent);
         } else {
-            taskVariableDeletedHandler.handle(variableDeletedEvent);
+            processVariableDeletedHandler.handle(variableDeletedEvent);
         }
-
     }
 
     @Override
-    public Class<? extends ProcessEngineEvent> getHandledEventClass() {
-        return VariableDeletedEvent.class;
+    public String getHandledEvent() {
+        return VariableEvent.VariableEvents.VARIABLE_DELETED.name();
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Alfresco, Inc. and/or its affiliates.
+ * Copyright 2018 Alfresco, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,11 +36,7 @@ public class EntityFinder {
 
     private <T> T getEntity(Optional<T> result,
                             String notFoundMessage) {
-        if (result.isPresent()) {
-            return result.get();
-        } else {
-            throw new IllegalStateException(notFoundMessage);
-        }
+        return result.orElseThrow(() -> new IllegalStateException(notFoundMessage));
     }
 
     public <T> T findOne(QuerydslPredicateExecutor<T> predicateExecutor,

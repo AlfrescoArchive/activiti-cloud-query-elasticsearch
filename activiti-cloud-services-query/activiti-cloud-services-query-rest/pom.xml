@@ -1,32 +1,88 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
-    <groupId>org.activiti.cloud</groupId>
-    <artifactId>activiti-cloud-services-query</artifactId>
-    <version>7-201712-EA-SNAPSHOT</version>
+    <groupId>org.activiti.cloud.query</groupId>
+    <artifactId>activiti-cloud-services-query-elasticsearch</artifactId>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-
   <artifactId>activiti-cloud-services-query-rest</artifactId>
-  <name>Activiti - Services :: Query REST</name>
-  <description>Activiti Services Query REST</description>
+  <name>Activiti Cloud Query :: Services :: Query REST</name>
   <dependencies>
-    <!-- keycloak included as default identity provider to be excluded if overridden -->
     <dependency>
-      <groupId>org.activiti.cloud</groupId>
-      <artifactId>activiti-cloud-services-api</artifactId>
+      <groupId>org.activiti.core.common</groupId>
+      <artifactId>activiti-spring-identity</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud</groupId>
-      <artifactId>activiti-cloud-services-identity-keycloak</artifactId>
+      <groupId>org.activiti.core.common</groupId>
+      <artifactId>activiti-spring-security-policies</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud</groupId>
+      <groupId>org.activiti.cloud.query</groupId>
       <artifactId>activiti-cloud-services-query-model</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.activiti.cloud</groupId>
+      <groupId>org.activiti.cloud.query</groupId>
       <artifactId>activiti-cloud-services-query-repo</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.common</groupId>
+      <artifactId>activiti-cloud-services-dbp-rest</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.api</groupId>
+      <artifactId>activiti-cloud-api-model-shared</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.api</groupId>
+      <artifactId>activiti-cloud-api-process-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.api</groupId>
+      <artifactId>activiti-api-task-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.api</groupId>
+      <artifactId>activiti-cloud-api-task-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.api</groupId>
+      <artifactId>activiti-api-model-shared</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.api</groupId>
+      <artifactId>activiti-api-runtime-shared</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.api</groupId>
+      <artifactId>activiti-api-process-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.api</groupId>
+      <artifactId>activiti-cloud-api-task-model-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.api</groupId>
+      <artifactId>activiti-cloud-api-process-model-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-rest-webmvc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.1-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
@@ -92,21 +148,17 @@
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-    </dependency>
-    <dependency>
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.hibernate.javax.persistence</groupId>
-      <artifactId>hibernate-jpa-2.1-api</artifactId>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
     </dependency>
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>runtime</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.querydsl</groupId>
@@ -123,10 +175,6 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.activiti.cloud</groupId>
-      <artifactId>activiti-cloud-services-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -143,8 +191,27 @@
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.springframework.restdocs</groupId>
+      <artifactId>spring-restdocs-mockmvc</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.common</groupId>
+      <artifactId>activiti-cloud-services-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.activiti.cloud.common</groupId>
+      <artifactId>activiti-cloud-services-rest-docs</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>net.javacrumbs.json-unit</groupId>
+      <artifactId>json-unit-fluent</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-
   <build>
     <plugins>
       <plugin>
@@ -165,11 +232,9 @@
           </execution>
         </executions>
       </plugin>
-
       <plugin>
         <groupId>org.assertj</groupId>
         <artifactId>assertj-assertions-generator-maven-plugin</artifactId>
-
         <executions>
           <execution>
             <goals>
@@ -177,26 +242,24 @@
             </goals>
           </execution>
         </executions>
-
         <configuration>
-
           <packages>
             <package>org.activiti.cloud.services.query.model</package>
           </packages>
-
           <!-- whether generated assertions classes can be inherited with consistent assertion chaining -->
           <hierarchical>true</hierarchical>
-
           <!-- where to generate assertions entry point classes -->
           <entryPointClassPackage>${generated-assertions-package}</entryPointClassPackage>
-
           <targetDir>${generated-assertions-folder}</targetDir>
           <generateAssertions>true</generateAssertions>
           <generateBddAssertions>false</generateBddAssertions>
           <generateSoftAssertions>false</generateSoftAssertions>
           <generateJUnitSoftAssertions>false</generateJUnitSoftAssertions>
-
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.asciidoctor</groupId>
+        <artifactId>asciidoctor-maven-plugin</artifactId>
       </plugin>
     </plugins>
   </build>

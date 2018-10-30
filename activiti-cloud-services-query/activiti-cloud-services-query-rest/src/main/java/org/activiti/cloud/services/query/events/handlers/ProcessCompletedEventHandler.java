@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Alfresco, Inc. and/or its affiliates.
+ * Copyright 2018 Alfresco, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@ package org.activiti.cloud.services.query.events.handlers;
 import java.util.Date;
 import java.util.Optional;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.cloud.services.api.events.ProcessEngineEvent;
-import org.activiti.cloud.services.query.model.ProcessInstance;
+import org.activiti.api.process.model.ProcessInstance;
+import org.activiti.api.process.model.events.ProcessRuntimeEvent;
+import org.activiti.cloud.api.model.shared.events.CloudRuntimeEvent;
+import org.activiti.cloud.api.process.model.events.CloudProcessCompletedEvent;
 import org.activiti.cloud.services.query.app.repository.ProcessInstanceRepository;
-import org.activiti.cloud.services.query.events.ProcessCompletedEvent;
+import org.activiti.cloud.services.query.model.ProcessInstanceEntity;
+import org.activiti.cloud.services.query.model.QueryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -38,22 +40,22 @@ public class ProcessCompletedEventHandler implements QueryEventHandler {
     }
 
     @Override
-    public void handle(ProcessEngineEvent completedEvent) {
-        String processInstanceId = completedEvent.getProcessInstanceId();
-        Optional<ProcessInstance> findResult = processInstanceRepository.findById(processInstanceId);
+    public void handle(CloudRuntimeEvent<?, ?> event) {
+        CloudProcessCompletedEvent completedEvent = (CloudProcessCompletedEvent) event;
+        String processInstanceId = completedEvent.getEntity().getId();
+        Optional<ProcessInstanceEntity> findResult = processInstanceRepository.findById(processInstanceId);
         if (findResult.isPresent()) {
-            ProcessInstance processInstance = findResult.get();
-            processInstance.setStatus("COMPLETED");
-            processInstance.setLastModified(new Date(completedEvent.getTimestamp()));
-            processInstanceRepository.save(processInstance);
+            ProcessInstanceEntity processInstanceEntity = findResult.get();
+            processInstanceEntity.setStatus(ProcessInstance.ProcessInstanceStatus.COMPLETED);
+            processInstanceEntity.setLastModified(new Date(completedEvent.getTimestamp()));
+            processInstanceRepository.save(processInstanceEntity);
         } else {
-            throw new ActivitiException("Unable to find process instance with the given id: " + processInstanceId);
+            throw new QueryException("Unable to find process instance with the given id: " + processInstanceId);
         }
     }
 
     @Override
-    public Class<? extends ProcessEngineEvent> getHandledEventClass() {
-        return ProcessCompletedEvent.class;
+    public String getHandledEvent() {
+        return ProcessRuntimeEvent.ProcessEvents.PROCESS_COMPLETED.name();
     }
-
 }
