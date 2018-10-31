@@ -104,32 +104,17 @@
         <groupId>org.activiti.cloud.query</groupId>
         <artifactId>activiti-cloud-services-query-parent</artifactId>
         <version>${activiti-cloud-query-service.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.activiti.cloud.query</groupId>
-        <artifactId>activiti-cloud-services-query-model</artifactId>
-        <version>${activiti-cloud-query-service.version}</version>
-      </dependency>
+      </dependency>      
       <dependency>
         <groupId>org.activiti.cloud.query</groupId>
         <artifactId>activiti-cloud-services-query-model-elasticsearch</artifactId>
         <version>${activiti-cloud-query-service.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.activiti.cloud.query</groupId>
-        <artifactId>activiti-cloud-services-query-repo</artifactId>
-        <version>${activiti-cloud-query-service.version}</version>
-      </dependency>
+      </dependency>      
       <dependency>
         <groupId>org.activiti.cloud.query</groupId>
         <artifactId>activiti-cloud-services-query-repo-elasticsearch</artifactId>
         <version>${activiti-cloud-query-service.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.activiti.cloud.query</groupId>
-        <artifactId>activiti-cloud-services-query-rest</artifactId>
-        <version>${activiti-cloud-query-service.version}</version>
-      </dependency>
+      </dependency>      
       <dependency>
         <groupId>org.activiti.cloud.query</groupId>
         <artifactId>activiti-cloud-services-query-rest-elasticsearch</artifactId>
@@ -172,7 +157,7 @@
       </dependency>
       <dependency>
         <groupId>org.activiti.cloud.query</groupId>
-        <artifactId>activiti-cloud-starter-query</artifactId>
+        <artifactId>activiti-cloud-starter-query-elasticsearch</artifactId>
         <version>${activiti-cloud-query-service.version}</version>
       </dependency>
       <dependency>
