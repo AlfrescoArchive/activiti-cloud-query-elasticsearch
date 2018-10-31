@@ -56,6 +56,7 @@ public class VariableUpdatedEventHandler implements QueryEventHandler {
                                                            new Date(variableUpdatedEvent.getTimestamp()),
                                                            null);
         variableEntity.setValue(variableUpdatedEvent.getEntity().getValue());
+        System.out.println("UPDATING VARIABLE " + variableEntity.getName() + " - " + variableEntity.getType() + " - " + variableEntity.getValue());
         if (variableUpdatedEvent.getEntity().isTaskVariable()) {
             taskVariableUpdatedEventHandler.handle(variableEntity);
         } else {
