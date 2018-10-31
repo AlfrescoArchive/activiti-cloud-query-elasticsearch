@@ -17,7 +17,6 @@
   <modules>
     <module>activiti-cloud-query-dependencies-elasticsearch</module>
     <module>activiti-cloud-services-query</module>
-    <module>activiti-cloud-starter-query</module>
     <module>activiti-cloud-starter-query-elasticsearch</module>
   </modules>
   <scm>
