@@ -25,18 +25,6 @@
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-rest-core</artifactId>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>com.querydsl</groupId> -->
-<!--       <artifactId>querydsl-apt</artifactId> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>com.querydsl</groupId> -->
-<!--       <artifactId>querydsl-core</artifactId> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>com.querydsl</groupId> -->
-<!--       <artifactId>querydsl-jpa</artifactId> -->
-<!--     </dependency> -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

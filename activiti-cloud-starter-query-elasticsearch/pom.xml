@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.activiti.cloud.query</groupId>
-    <artifactId>activiti-cloud-query-service-parent</artifactId>
+    <artifactId>activiti-cloud-query-service-elasticsearch-parent</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
   <artifactId>activiti-cloud-starter-query-elasticsearch</artifactId>
@@ -32,7 +32,7 @@
     </dependency>
     <dependency>
       <groupId>org.activiti.cloud.query</groupId>
-      <artifactId>activiti-cloud-services-query-rest-elastic</artifactId>
+      <artifactId>activiti-cloud-services-query-rest-elasticsearch</artifactId>
     </dependency>
     <dependency>
       <groupId>org.activiti.cloud.common</groupId>
@@ -65,26 +65,7 @@
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
-    </dependency>
-    
-<!--       <dependency> -->
-<!-- 		<groupId>org.elasticsearch</groupId> -->
-<!-- 		<artifactId>elasticsearch</artifactId> -->
-<!-- 	  </dependency> -->
-<!-- 	  <dependency> -->
-<!-- 		<groupId>org.elasticsearch.client</groupId> -->
-<!-- 		<artifactId>transport</artifactId> -->
-<!-- 	  </dependency> -->
-<!-- 	  <dependency> -->
-<!-- 		<groupId>org.elasticsearch.distribution.integ-test-zip</groupId> -->
-<!-- 		<artifactId>elasticsearch</artifactId> -->
-<!-- 		<type>zip</type> -->
-<!-- 	  </dependency> -->
-<!-- 	  <dependency> -->
-<!-- 		<groupId>org.elasticsearch.plugin</groupId> -->
-<!-- 		<artifactId>transport-netty4-client</artifactId> -->
-<!-- 	  </dependency> -->
-    
+    </dependency>    
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
@@ -100,11 +81,6 @@
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>com.h2database</groupId> -->
-<!--       <artifactId>h2</artifactId> -->
-<!--       <scope>test</scope> -->
-<!--     </dependency> -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
