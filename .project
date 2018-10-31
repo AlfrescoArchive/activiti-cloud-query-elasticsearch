@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>activiti_elastic</name>
+	<name>activiti-cloud-query-service-elasticsearch-parent</name>
 	<comment></comment>
 	<projects>
 	</projects>
