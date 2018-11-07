@@ -18,7 +18,11 @@ public abstract class ActivitiEntityMetadata implements CloudRuntimeEntity {
 
     }
 
-    public ActivitiEntityMetadata(String serviceName, String serviceFullName, String serviceVersion, String appName,
+    public ActivitiEntityMetadata(
+            String serviceName,
+            String serviceFullName,
+            String serviceVersion,
+            String appName,
             String appVersion) {
         this.serviceName = serviceName;
         this.serviceFullName = serviceFullName;

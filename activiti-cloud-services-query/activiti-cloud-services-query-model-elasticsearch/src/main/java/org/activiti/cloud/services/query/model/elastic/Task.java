@@ -65,32 +65,34 @@ public class Task extends ActivitiEntityMetadata implements CloudTask {
     private Date lastModifiedFrom;
 
     @JsonIgnore
-//	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-//	@JoinColumn(name = "processInstanceId", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @javax.persistence.ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
     private ProcessInstance processInstance;
 
-//	@JsonIgnore
-//	@OneToMany(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "taskId", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @javax.persistence.ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
-//	private Set<TaskCandidateUser> taskCandidateUsers;
-
-//	@JsonIgnore
-//	@OneToMany(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "taskId", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @javax.persistence.ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
-//	private Set<TaskCandidateGroup> taskCandidateGroups;
-
-//	@JsonIgnore
-//	@OneToMany(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "taskId", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @javax.persistence.ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
     private Map<String, Set<Variable>> variables;
 
     public Task() {
     }
 
-    public Task(String id, String assignee, String name, String description, Date createTime, Date dueDate,
-            int priority, String category, String processDefinitionId, String processInstanceId, String serviceName,
-            String serviceFullName, String serviceVersion, String appName, String appVersion, TaskStatus status,
-            Date lastModified, Date claimedDate, String owner, String parentTaskId) {
+    public Task(
+            String id,
+            String assignee,
+            String name,
+            String description,
+            Date createTime,
+            Date dueDate,
+            int priority,
+            String category,
+            String processDefinitionId,
+            String processInstanceId,
+            String serviceName,
+            String serviceFullName,
+            String serviceVersion,
+            String appName,
+            String appVersion,
+            TaskStatus status,
+            Date lastModified,
+            Date claimedDate,
+            String owner,
+            String parentTaskId) {
         super(serviceName, serviceFullName, serviceVersion, appName, appVersion);
         this.id = id;
         this.assignee = assignee;

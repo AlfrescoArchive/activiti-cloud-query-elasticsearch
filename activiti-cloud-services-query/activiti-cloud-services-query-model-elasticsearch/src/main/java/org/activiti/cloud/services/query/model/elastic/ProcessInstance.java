@@ -37,18 +37,20 @@ public class ProcessInstance extends ActivitiEntityMetadata implements CloudProc
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private Date lastModifiedFrom;
 
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "processInstance")
-//    @org.hibernate.annotations.ForeignKey(name = "none")
-//    private Set<TaskEntity> tasks;
-
     private Map<String, Set<Variable>> variables;
 
     public ProcessInstance() {
     }
 
-    public ProcessInstance(String serviceName, String serviceFullName, String serviceVersion, String appName,
-            String appVersion, String processInstanceId, String processDefinitionId, ProcessInstanceStatus status,
+    public ProcessInstance(
+            String serviceName,
+            String serviceFullName,
+            String serviceVersion,
+            String appName,
+            String appVersion,
+            String processInstanceId,
+            String processDefinitionId,
+            ProcessInstanceStatus status,
             Date lastModified) {
         super(serviceName, serviceFullName, serviceVersion, appName, appVersion);
         this.id = processInstanceId;

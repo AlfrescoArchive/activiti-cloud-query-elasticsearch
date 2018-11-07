@@ -65,9 +65,20 @@ public class Variable extends ActivitiEntityMetadata implements CloudVariableIns
     public Variable() {
     }
 
-    public Variable(String id, String type, String name, String processInstanceId, String serviceName,
-            String serviceFullName, String serviceVersion, String appName, String appVersion, String taskId,
-            Date createTime, Date lastUpdatedTime, String executionId) {
+    public Variable(
+            String id,
+            String type,
+            String name,
+            String processInstanceId,
+            String serviceName,
+            String serviceFullName,
+            String serviceVersion,
+            String appName,
+            String appVersion,
+            String taskId,
+            Date createTime,
+            Date lastUpdatedTime,
+            String executionId) {
         super(serviceName, serviceFullName, serviceVersion, appName, appVersion);
         this.id = id;
         this.type = type;
