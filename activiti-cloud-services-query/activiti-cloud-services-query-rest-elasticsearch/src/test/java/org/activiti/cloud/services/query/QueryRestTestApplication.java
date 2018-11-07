@@ -24,10 +24,10 @@ import org.springframework.context.ApplicationContext;
 @SpringBootApplication
 public class QueryRestTestApplication {
 
-	public static void main(String[] args) {
-		ApplicationContext pls = SpringApplication.run(QueryRestTestApplication.class, args);
-		ESIndexesConfiguration indexesConfiguration = (ESIndexesConfiguration) pls.getBean("esIndexesConfiguration");
-		System.out.println(indexesConfiguration.getProcessInstanceIndex());
-	}
+    public static void main(String[] args) {
+        ApplicationContext pls = SpringApplication.run(QueryRestTestApplication.class, args);
+        ESIndexesConfiguration indexesConfiguration = (ESIndexesConfiguration) pls.getBean("esIndexesConfiguration");
+        System.out.println(indexesConfiguration.getProcessInstanceIndex());
+    }
 
 }

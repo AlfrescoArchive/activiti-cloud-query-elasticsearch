@@ -32,34 +32,34 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskCancelledEventHandler implements QueryEventHandler {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(TaskCancelledEventHandler.class);
-	
-	private final TaskRepository taskRepository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskCancelledEventHandler.class);
 
-	@Autowired
-	public TaskCancelledEventHandler(TaskRepository taskRepository) {
-		this.taskRepository = taskRepository;
-	}
+    private final TaskRepository taskRepository;
 
-	@Override
-	public void handle(CloudRuntimeEvent<?, ?> event) {
-		CloudTaskCancelledEvent taskCancelledEvent = (CloudTaskCancelledEvent) event;
-		org.activiti.api.task.model.Task eventTask = taskCancelledEvent.getEntity();
-		LOGGER.debug("Handling cancelled task Instance " + eventTask.getId());
-		updateTaskStatus(
-				taskRepository.findById(eventTask.getId())
-						.orElseThrow(() -> new QueryException("Unable to find task with id: " + eventTask.getId())),
-				taskCancelledEvent.getTimestamp());
-	}
+    @Autowired
+    public TaskCancelledEventHandler(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
-	private void updateTaskStatus(Task taskEntity, Long eventTimestamp) {
-		taskEntity.setStatus(Task.TaskStatus.CANCELLED);
-		taskEntity.setLastModified(new Date(eventTimestamp));
-		taskRepository.save(taskEntity);
-	}
+    @Override
+    public void handle(CloudRuntimeEvent<?, ?> event) {
+        CloudTaskCancelledEvent taskCancelledEvent = (CloudTaskCancelledEvent) event;
+        org.activiti.api.task.model.Task eventTask = taskCancelledEvent.getEntity();
+        LOGGER.debug("Handling cancelled task Instance " + eventTask.getId());
+        updateTaskStatus(
+                taskRepository.findById(eventTask.getId())
+                        .orElseThrow(() -> new QueryException("Unable to find task with id: " + eventTask.getId())),
+                taskCancelledEvent.getTimestamp());
+    }
 
-	@Override
-	public String getHandledEvent() {
-		return TaskRuntimeEvent.TaskEvents.TASK_CANCELLED.name();
-	}
+    private void updateTaskStatus(Task taskEntity, Long eventTimestamp) {
+        taskEntity.setStatus(Task.TaskStatus.CANCELLED);
+        taskEntity.setLastModified(new Date(eventTimestamp));
+        taskRepository.save(taskEntity);
+    }
+
+    @Override
+    public String getHandledEvent() {
+        return TaskRuntimeEvent.TaskEvents.TASK_CANCELLED.name();
+    }
 }

@@ -48,43 +48,40 @@ public class VariableDeletedEventHandlerTest {
 
     @Test
     public void handleShouldUseProcessVariableDeleteHandlerWhenNoTaskId() {
-        //given
+        // given
         CloudVariableDeletedEventImpl event = new CloudVariableDeletedEventImpl(buildVariable());
 
-        //when
+        // when
         handler.handle(event);
 
-        //then
+        // then
         verify(processVariableDeletedHandler).handle(event);
     }
 
     private VariableInstanceImpl<String> buildVariable() {
-        return new VariableInstanceImpl<>("var",
-                                          "v1",
-                                          "string",
-                                          UUID.randomUUID().toString());
+        return new VariableInstanceImpl<>("var", "v1", "string", UUID.randomUUID().toString());
     }
 
     @Test
     public void handleShouldUseProcessVariableDeleteHandlerWhenTaskIdIsPresent() {
-        //given
+        // given
         VariableInstanceImpl<String> variableInstance = buildVariable();
         variableInstance.setTaskId(UUID.randomUUID().toString());
         CloudVariableDeletedEventImpl event = new CloudVariableDeletedEventImpl(variableInstance);
 
-        //when
+        // when
         handler.handle(event);
 
-        //then
+        // then
         verify(taskVariableDeletedEventHandler).handle(event);
     }
 
     @Test
     public void getHandledEventShouldReturnVariableDeletedEvent() {
-        //when
+        // when
         String handledEvent = handler.getHandledEvent();
 
-        //then
+        // then
         assertThat(handledEvent).isEqualTo(VariableEvent.VariableEvents.VARIABLE_DELETED.name());
     }
 }

@@ -58,52 +58,49 @@ public class TaskSuspendedEventHandlerTest {
 
     @Test
     public void handleShouldUpdateTaskStatusToSuspended() {
-        //given
+        // given
         CloudTaskSuspendedEventImpl event = buildTaskSuspendedEvent();
         String taskId = event.getEntity().getId();
-        Task taskEntity = aTask()
-                .withId(taskId)
-                .build();
+        Task taskEntity = aTask().withId(taskId).build();
 
         given(taskRepository.findById(taskId)).willReturn(Optional.of(taskEntity));
 
-        //when
+        // when
         handler.handle(event);
 
-        //then
+        // then
         verify(taskRepository).save(taskEntity);
         verify(taskEntity).setStatus(Task.TaskStatus.SUSPENDED);
         verify(taskEntity).setLastModified(any(Date.class));
     }
 
     private CloudTaskSuspendedEventImpl buildTaskSuspendedEvent() {
-        return new CloudTaskSuspendedEventImpl(new TaskImpl(UUID.randomUUID().toString(),
-                                                            "task",
-                                                            Task.TaskStatus.SUSPENDED));
+        return new CloudTaskSuspendedEventImpl(
+                new TaskImpl(UUID.randomUUID().toString(), "task", Task.TaskStatus.SUSPENDED));
     }
 
     @Test
     public void handleShouldThrowExceptionWhenNoTaskIsFoundForTheGivenId() {
-        //given
+        // given
         CloudTaskSuspendedEventImpl event = buildTaskSuspendedEvent();
         String taskId = event.getEntity().getId();
 
         given(taskRepository.findById(taskId)).willReturn(Optional.empty());
 
-        //then
+        // then
         expectedException.expect(QueryException.class);
         expectedException.expectMessage("Unable to find task with id: " + taskId);
 
-        //when
+        // when
         handler.handle(event);
     }
 
     @Test
     public void getHandledEventShouldReturnTaskSuspendedEvent() {
-        //when
+        // when
         String handledEvent = handler.getHandledEvent();
 
-        //then
+        // then
         assertThat(handledEvent).isEqualTo(TaskRuntimeEvent.TaskEvents.TASK_SUSPENDED.name());
     }
 }

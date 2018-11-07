@@ -49,63 +49,52 @@ public class VariableUpdatedEventHandlerTest {
 
     @Test
     public void handleShouldUseProcessVariableUpdateHandlerWhenNoTaskId() {
-        //given
+        // given
         CloudVariableUpdatedEventImpl event = new CloudVariableUpdatedEventImpl(buildVariable());
         event.setServiceName("runtime-bundle-a");
 
-        //when
+        // when
         handler.handle(event);
 
-        //then
+        // then
         ArgumentCaptor<Variable> captor = ArgumentCaptor.forClass(Variable.class);
         verify(processVariableUpdateEventHandler).handle(captor.capture());
 
         Variable variableEntity = captor.getValue();
-        Assertions.assertThat(variableEntity)
-                .hasProcessInstanceId(event.getEntity().getProcessInstanceId())
-                .hasName("var")
-                .hasServiceName("runtime-bundle-a")
-                .hasValue("v1")
-                .hasType("string");
+        Assertions.assertThat(variableEntity).hasProcessInstanceId(event.getEntity().getProcessInstanceId())
+                .hasName("var").hasServiceName("runtime-bundle-a").hasValue("v1").hasType("string");
     }
-    
+
     private VariableInstanceImpl<String> buildVariable() {
-        return new VariableInstanceImpl<>("var",
-                                          "string",
-                                          "v1",
-                                          "10");
+        return new VariableInstanceImpl<>("var", "string", "v1", "10");
     }
 
     @Test
     public void handleShouldUseTaskVariableUpdateHandlerWhenTaskIdIsSet() {
-        //given
+        // given
         VariableInstanceImpl<String> variableInstance = buildVariable();
         variableInstance.setTaskId("20");
         CloudVariableUpdatedEventImpl event = new CloudVariableUpdatedEventImpl(variableInstance);
         event.setServiceName("runtime-bundle-a");
 
-        //when
+        // when
         handler.handle(event);
 
-        //then
+        // then
         ArgumentCaptor<Variable> captor = ArgumentCaptor.forClass(Variable.class);
         verify(taskVariableUpdatedEventHandler).handle(captor.capture());
 
         Variable variableEntity = captor.getValue();
-        Assertions.assertThat(variableEntity)
-                .hasTaskId("20")
-                .hasName("var")
-                .hasValue("v1")
-                .hasServiceName("runtime-bundle-a")
-                .hasType("string");
+        Assertions.assertThat(variableEntity).hasTaskId("20").hasName("var").hasValue("v1")
+                .hasServiceName("runtime-bundle-a").hasType("string");
     }
 
     @Test
     public void getHandledEventClassShouldReturnVariableUpdatedEvent() {
-        //when
+        // when
         String handledEvent = handler.getHandledEvent();
 
-        //then
+        // then
         assertThat(handledEvent).isEqualTo(VariableEvent.VariableEvents.VARIABLE_UPDATED.name());
     }
 }

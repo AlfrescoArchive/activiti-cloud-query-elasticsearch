@@ -31,177 +31,177 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Variable extends ActivitiEntityMetadata implements CloudVariableInstance {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private String id;
 
-	private String type;
+    private String type;
 
-	private String name;
+    private String name;
 
-	private String processInstanceId;
+    private String processInstanceId;
 
-	private String taskId;
+    private String taskId;
 
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-	private Date createTime;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private Date createTime;
 
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-	private Date lastUpdatedTime;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private Date lastUpdatedTime;
 
-	private String executionId;
+    private String executionId;
 
-	@Convert(converter = VariableValueJsonConverter.class)
-	private VariableValue<?> value;
+    @Convert(converter = VariableValueJsonConverter.class)
+    private VariableValue<?> value;
 
-	private Boolean markedAsDeleted = false;
+    private Boolean markedAsDeleted = false;
 
-	@JsonIgnore
-	private Task task;
+    @JsonIgnore
+    private Task task;
 
-	@JsonIgnore
-	private ProcessInstance processInstance;
+    @JsonIgnore
+    private ProcessInstance processInstance;
 
-	public Variable() {
-	}
+    public Variable() {
+    }
 
-	public Variable(String id, String type, String name, String processInstanceId, String serviceName,
-			String serviceFullName, String serviceVersion, String appName, String appVersion, String taskId,
-			Date createTime, Date lastUpdatedTime, String executionId) {
-		super(serviceName, serviceFullName, serviceVersion, appName, appVersion);
-		this.id = id;
-		this.type = type;
-		this.name = name;
-		this.processInstanceId = processInstanceId;
-		this.taskId = taskId;
-		this.createTime = createTime;
-		this.lastUpdatedTime = lastUpdatedTime;
-		this.executionId = executionId;
-	}
+    public Variable(String id, String type, String name, String processInstanceId, String serviceName,
+            String serviceFullName, String serviceVersion, String appName, String appVersion, String taskId,
+            Date createTime, Date lastUpdatedTime, String executionId) {
+        super(serviceName, serviceFullName, serviceVersion, appName, appVersion);
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.processInstanceId = processInstanceId;
+        this.taskId = taskId;
+        this.createTime = createTime;
+        this.lastUpdatedTime = lastUpdatedTime;
+        this.executionId = executionId;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getId() {
+        return id;
+    }
 
-	@Override
-	public String getType() {
-		return type;
-	}
+    @Override
+    public String getType() {
+        return type;
+    }
 
-	public void setType(String type) {
-		this.type = type;
-	}
+    public void setType(String type) {
+        this.type = type;
+    }
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	@Override
-	public String getProcessInstanceId() {
-		return processInstanceId;
-	}
+    @Override
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
 
-	public void setProcessInstanceId(String processInstanceId) {
-		this.processInstanceId = processInstanceId;
-	}
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 
-	@Override
-	public String getTaskId() {
-		return taskId;
-	}
+    @Override
+    public String getTaskId() {
+        return taskId;
+    }
 
-	public void setTaskId(String taskId) {
-		this.taskId = taskId;
-	}
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
-	public Date getCreateTime() {
-		return createTime;
-	}
+    public Date getCreateTime() {
+        return createTime;
+    }
 
-	public void setCreateTime(Date createTime) {
-		this.createTime = createTime;
-	}
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
 
-	public Date getLastUpdatedTime() {
-		return lastUpdatedTime;
-	}
+    public Date getLastUpdatedTime() {
+        return lastUpdatedTime;
+    }
 
-	public void setLastUpdatedTime(Date lastUpdatedTime) {
-		this.lastUpdatedTime = lastUpdatedTime;
-	}
+    public void setLastUpdatedTime(Date lastUpdatedTime) {
+        this.lastUpdatedTime = lastUpdatedTime;
+    }
 
-	public String getExecutionId() {
-		return executionId;
-	}
+    public String getExecutionId() {
+        return executionId;
+    }
 
-	public void setExecutionId(String executionId) {
-		this.executionId = executionId;
-	}
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
+    }
 
-	public <T> void setValue(T value) {
-		this.value = new VariableValue<>(value);
-	}
+    public <T> void setValue(T value) {
+        this.value = new VariableValue<>(value);
+    }
 
-	@Override
-	public <T> T getValue() {
-		return (T) value.getValue();
-	}
+    @Override
+    public <T> T getValue() {
+        return (T) value.getValue();
+    }
 
-	public ProcessInstance getProcessInstance() {
-		return this.processInstance;
-	}
+    public ProcessInstance getProcessInstance() {
+        return this.processInstance;
+    }
 
-	public void setProcessInstance(ProcessInstance processInstance) {
-		this.processInstance = processInstance;
-	}
+    public void setProcessInstance(ProcessInstance processInstance) {
+        this.processInstance = processInstance;
+    }
 
-	public Task getTask() {
-		return this.task;
-	}
+    public Task getTask() {
+        return this.task;
+    }
 
-	public void setTask(Task task) {
-		this.task = task;
-	}
+    public void setTask(Task task) {
+        this.task = task;
+    }
 
-	public Boolean getMarkedAsDeleted() {
-		return markedAsDeleted;
-	}
+    public Boolean getMarkedAsDeleted() {
+        return markedAsDeleted;
+    }
 
-	public void setMarkedAsDeleted(Boolean markedAsDeleted) {
-		this.markedAsDeleted = markedAsDeleted;
-	}
+    public void setMarkedAsDeleted(Boolean markedAsDeleted) {
+        this.markedAsDeleted = markedAsDeleted;
+    }
 
-	@Override
-	public boolean isTaskVariable() {
-		return taskId != null;
-	}
+    @Override
+    public boolean isTaskVariable() {
+        return taskId != null;
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(this.type, this.name, this.taskId, this.processInstanceId);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.type, this.name, this.taskId, this.processInstanceId);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (!(obj instanceof Variable)) {
-			return false;
-		}
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Variable)) {
+            return false;
+        }
 
-		Variable other = (Variable) obj;
-		boolean basicCondition = Objects.equals(other.type, this.type) && Objects.equals(other.name, this.name);
-		if (!basicCondition) {
-			return false;
-		}
+        Variable other = (Variable) obj;
+        boolean basicCondition = Objects.equals(other.type, this.type) && Objects.equals(other.name, this.name);
+        if (!basicCondition) {
+            return false;
+        }
 
-		if (other.isTaskVariable()) {
-			return Objects.equals(other.taskId, this.taskId);
-		}
-		return Objects.equals(other.processInstanceId, this.processInstanceId);
-	}
+        if (other.isTaskVariable()) {
+            return Objects.equals(other.taskId, this.taskId);
+        }
+        return Objects.equals(other.processInstanceId, this.processInstanceId);
+    }
 
 }

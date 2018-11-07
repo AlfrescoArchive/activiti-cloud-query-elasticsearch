@@ -27,23 +27,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class VariableDeletedEventHandler implements QueryEventHandler {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(VariableDeletedEventHandler.class);
-	
+    private static final Logger LOGGER = LoggerFactory.getLogger(VariableDeletedEventHandler.class);
+
     private final ProcessVariableDeletedEventHandler processVariableDeletedHandler;
 
     private final TaskVariableDeletedEventHandler taskVariableDeletedEventHandler;
 
-	@Autowired
-	public VariableDeletedEventHandler(
-    		ProcessVariableDeletedEventHandler processVariableDeletedHandler,
-                                       TaskVariableDeletedEventHandler taskVariableDeletedEventHandler
-	) {
+    @Autowired
+    public VariableDeletedEventHandler(ProcessVariableDeletedEventHandler processVariableDeletedHandler,
+            TaskVariableDeletedEventHandler taskVariableDeletedEventHandler) {
         this.processVariableDeletedHandler = processVariableDeletedHandler;
         this.taskVariableDeletedEventHandler = taskVariableDeletedEventHandler;
-	}
+    }
 
-	@Override
-	public void handle(CloudRuntimeEvent<?, ?> event) {
+    @Override
+    public void handle(CloudRuntimeEvent<?, ?> event) {
         CloudVariableDeletedEvent variableDeletedEvent = (CloudVariableDeletedEvent) event;
         LOGGER.debug("Handling variableEntity deleted event: " + variableDeletedEvent.getEntity().getName());
         if (variableDeletedEvent.getEntity().isTaskVariable()) {
@@ -51,10 +49,10 @@ public class VariableDeletedEventHandler implements QueryEventHandler {
         } else {
             processVariableDeletedHandler.handle(variableDeletedEvent);
         }
-	}
+    }
 
-	@Override
-	public String getHandledEvent() {
-		return VariableEvent.VariableEvents.VARIABLE_DELETED.name();
-	}
+    @Override
+    public String getHandledEvent() {
+        return VariableEvent.VariableEvents.VARIABLE_DELETED.name();
+    }
 }

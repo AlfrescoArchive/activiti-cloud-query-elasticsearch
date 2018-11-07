@@ -1,4 +1,6 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.activiti.cloud.query</groupId>
@@ -72,10 +74,10 @@
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-rest-webmvc</artifactId>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>org.hibernate.javax.persistence</groupId> -->
-<!--       <artifactId>hibernate-jpa-2.1-api</artifactId> -->
-<!--     </dependency> -->
+    <!-- <dependency> -->
+    <!-- <groupId>org.hibernate.javax.persistence</groupId> -->
+    <!-- <artifactId>hibernate-jpa-2.1-api</artifactId> -->
+    <!-- </dependency> -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -89,14 +91,14 @@
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-commons</artifactId>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>org.springframework.data</groupId> -->
-<!--       <artifactId>spring-data-jpa</artifactId> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.springframework.data</groupId> -->
-<!--       <artifactId>spring-data-rest-core</artifactId> -->
-<!--     </dependency> -->
+    <!-- <dependency> -->
+    <!-- <groupId>org.springframework.data</groupId> -->
+    <!-- <artifactId>spring-data-jpa</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!-- <groupId>org.springframework.data</groupId> -->
+    <!-- <artifactId>spring-data-rest-core</artifactId> -->
+    <!-- </dependency> -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
@@ -133,14 +135,14 @@
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>org.springframework.boot</groupId> -->
-<!--       <artifactId>spring-boot-starter-data-jpa</artifactId> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.springframework.boot</groupId> -->
-<!--       <artifactId>spring-boot-starter-data-rest</artifactId> -->
-<!--     </dependency> -->
+    <!-- <dependency> -->
+    <!-- <groupId>org.springframework.boot</groupId> -->
+    <!-- <artifactId>spring-boot-starter-data-jpa</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!-- <groupId>org.springframework.boot</groupId> -->
+    <!-- <artifactId>spring-boot-starter-data-rest</artifactId> -->
+    <!-- </dependency> -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
@@ -149,27 +151,27 @@
       <groupId>com.fasterxml.jackson.core</groupId>
       <artifactId>jackson-annotations</artifactId>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>org.hibernate</groupId> -->
-<!--       <artifactId>hibernate-entitymanager</artifactId> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>com.h2database</groupId> -->
-<!--       <artifactId>h2</artifactId> -->
-<!--       <scope>test</scope> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>com.querydsl</groupId> -->
-<!--       <artifactId>querydsl-apt</artifactId> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>com.querydsl</groupId> -->
-<!--       <artifactId>querydsl-core</artifactId> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>com.querydsl</groupId> -->
-<!--       <artifactId>querydsl-jpa</artifactId> -->
-<!--     </dependency> -->
+    <!-- <dependency> -->
+    <!-- <groupId>org.hibernate</groupId> -->
+    <!-- <artifactId>hibernate-entitymanager</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!-- <groupId>com.h2database</groupId> -->
+    <!-- <artifactId>h2</artifactId> -->
+    <!-- <scope>test</scope> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!-- <groupId>com.querydsl</groupId> -->
+    <!-- <artifactId>querydsl-apt</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!-- <groupId>com.querydsl</groupId> -->
+    <!-- <artifactId>querydsl-core</artifactId> -->
+    <!-- </dependency> -->
+    <!-- <dependency> -->
+    <!-- <groupId>com.querydsl</groupId> -->
+    <!-- <artifactId>querydsl-jpa</artifactId> -->
+    <!-- </dependency> -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -213,17 +215,17 @@
   <build>
     <plugins>
       <plugin>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-source-plugin</artifactId>
-		<executions>
-			<execution>
-				<id>attach-sources</id>
-				<goals>
-					<goal>jar</goal>
-				</goals>
-			</execution>
-		</executions>
-	   </plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
@@ -256,7 +258,8 @@
           <packages>
             <package>org.activiti.cloud.services.query.model</package>
           </packages>
-          <!-- whether generated assertions classes can be inherited with consistent assertion chaining -->
+          <!-- whether generated assertions classes can be inherited with 
+            consistent assertion chaining -->
           <hierarchical>true</hierarchical>
           <!-- where to generate assertions entry point classes -->
           <entryPointClassPackage>${generated-assertions-package}</entryPointClassPackage>

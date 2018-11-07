@@ -32,29 +32,29 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessSuspendedEventHandler implements QueryEventHandler {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessSuspendedEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessSuspendedEventHandler.class);
 
-	private ProcessInstanceRepository processInstanceRepository;
+    private ProcessInstanceRepository processInstanceRepository;
 
-	@Autowired
-	public ProcessSuspendedEventHandler(ProcessInstanceRepository processInstanceRepository) {
-		this.processInstanceRepository = processInstanceRepository;
-	}
+    @Autowired
+    public ProcessSuspendedEventHandler(ProcessInstanceRepository processInstanceRepository) {
+        this.processInstanceRepository = processInstanceRepository;
+    }
 
-	@Override
-	public void handle(CloudRuntimeEvent<?, ?> event) {
-		CloudProcessSuspendedEvent suspendedEvent = (CloudProcessSuspendedEvent) event;
-		String processInstanceId = suspendedEvent.getEntity().getId();
-		LOGGER.debug("Handling suspended process Instance " + processInstanceId);
-		ProcessInstance processInstance = processInstanceRepository.findById(processInstanceId).orElseThrow(
-				() -> new QueryException("Unable to find process instance with the given id: " + processInstanceId));
-		processInstance.setStatus(ProcessInstance.ProcessInstanceStatus.SUSPENDED);
-		processInstance.setLastModified(new Date(suspendedEvent.getTimestamp()));
-		processInstanceRepository.save(processInstance);
-	}
+    @Override
+    public void handle(CloudRuntimeEvent<?, ?> event) {
+        CloudProcessSuspendedEvent suspendedEvent = (CloudProcessSuspendedEvent) event;
+        String processInstanceId = suspendedEvent.getEntity().getId();
+        LOGGER.debug("Handling suspended process Instance " + processInstanceId);
+        ProcessInstance processInstance = processInstanceRepository.findById(processInstanceId).orElseThrow(
+                () -> new QueryException("Unable to find process instance with the given id: " + processInstanceId));
+        processInstance.setStatus(ProcessInstance.ProcessInstanceStatus.SUSPENDED);
+        processInstance.setLastModified(new Date(suspendedEvent.getTimestamp()));
+        processInstanceRepository.save(processInstance);
+    }
 
-	@Override
-	public String getHandledEvent() {
-		return ProcessRuntimeEvent.ProcessEvents.PROCESS_SUSPENDED.name();
-	}
+    @Override
+    public String getHandledEvent() {
+        return ProcessRuntimeEvent.ProcessEvents.PROCESS_SUSPENDED.name();
+    }
 }

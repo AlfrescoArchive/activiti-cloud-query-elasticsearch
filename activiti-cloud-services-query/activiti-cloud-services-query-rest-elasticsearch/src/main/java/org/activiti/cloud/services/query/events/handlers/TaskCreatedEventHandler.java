@@ -29,54 +29,41 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskCreatedEventHandler implements QueryEventHandler {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(TaskCreatedEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskCreatedEventHandler.class);
 
-	private TaskRepository taskRepository;
+    private TaskRepository taskRepository;
 
-	public TaskCreatedEventHandler(TaskRepository taskRepository) {
-		this.taskRepository = taskRepository;
-	}
+    public TaskCreatedEventHandler(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
+    }
 
-	@Override
-	public void handle(CloudRuntimeEvent<?, ?> event) {
-		CloudTaskCreatedEvent taskCreatedEvent = (CloudTaskCreatedEvent) event;
-		LOGGER.debug("Handling created task Instance " + taskCreatedEvent.getEntity().getId());
+    @Override
+    public void handle(CloudRuntimeEvent<?, ?> event) {
+        CloudTaskCreatedEvent taskCreatedEvent = (CloudTaskCreatedEvent) event;
+        LOGGER.debug("Handling created task Instance " + taskCreatedEvent.getEntity().getId());
 
-		org.activiti.api.task.model.Task eventEntity = taskCreatedEvent.getEntity();
-		Task queryTaskEntity = new Task(eventEntity.getId(),
-				eventEntity.getAssignee(),
-				eventEntity.getName(),
-				eventEntity.getDescription(),
-				eventEntity.getCreatedDate(),
-				eventEntity.getDueDate(),
-				eventEntity.getPriority(),
-				null,
-				eventEntity.getProcessDefinitionId(),
-				eventEntity.getProcessInstanceId(),
-				event.getServiceName(),
-				event.getServiceFullName(),
-				event.getServiceVersion(),
-				event.getAppName(),
-				event.getAppVersion(),
-				Task.TaskStatus.CREATED,
-				eventEntity.getCreatedDate(),
-				eventEntity.getClaimedDate(),
-				eventEntity.getOwner(),
-				eventEntity.getParentTaskId());
+        org.activiti.api.task.model.Task eventEntity = taskCreatedEvent.getEntity();
+        Task queryTaskEntity = new Task(eventEntity.getId(), eventEntity.getAssignee(), eventEntity.getName(),
+                eventEntity.getDescription(), eventEntity.getCreatedDate(), eventEntity.getDueDate(),
+                eventEntity.getPriority(), null, eventEntity.getProcessDefinitionId(),
+                eventEntity.getProcessInstanceId(), event.getServiceName(), event.getServiceFullName(),
+                event.getServiceVersion(), event.getAppName(), event.getAppVersion(), Task.TaskStatus.CREATED,
+                eventEntity.getCreatedDate(), eventEntity.getClaimedDate(), eventEntity.getOwner(),
+                eventEntity.getParentTaskId());
 
-		persistIntoDatabase(event, queryTaskEntity);
-	}
+        persistIntoDatabase(event, queryTaskEntity);
+    }
 
-	private void persistIntoDatabase(CloudRuntimeEvent<?, ?> event, Task queryTaskEntity) {
-		try {
-			taskRepository.save(queryTaskEntity);
-		} catch (Exception cause) {
-			throw new QueryException("Error handling TaskCreatedEvent[" + event + "]", cause);
-		}
-	}
+    private void persistIntoDatabase(CloudRuntimeEvent<?, ?> event, Task queryTaskEntity) {
+        try {
+            taskRepository.save(queryTaskEntity);
+        } catch (Exception cause) {
+            throw new QueryException("Error handling TaskCreatedEvent[" + event + "]", cause);
+        }
+    }
 
-	@Override
-	public String getHandledEvent() {
-		return TaskRuntimeEvent.TaskEvents.TASK_CREATED.name();
-	}
+    @Override
+    public String getHandledEvent() {
+        return TaskRuntimeEvent.TaskEvents.TASK_CREATED.name();
+    }
 }

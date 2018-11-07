@@ -25,18 +25,18 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessVariableUpdateEventHandler {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessVariableUpdateEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessVariableUpdateEventHandler.class);
 
-	private VariableUpdater variableUpdater;
+    private VariableUpdater variableUpdater;
 
-	@Autowired
-	public ProcessVariableUpdateEventHandler(VariableUpdater variableUpdater) {
-		this.variableUpdater = variableUpdater;
-	}
+    @Autowired
+    public ProcessVariableUpdateEventHandler(VariableUpdater variableUpdater) {
+        this.variableUpdater = variableUpdater;
+    }
 
-	public void handle(Variable updatedVariableEntity) {
-		LOGGER.debug("Handling process variable updated event: " + updatedVariableEntity.getName());
-		variableUpdater.updateVariable(updatedVariableEntity);
-	}
+    public void handle(Variable updatedVariableEntity) {
+        LOGGER.debug("Handling process variable updated event: " + updatedVariableEntity.getName());
+        variableUpdater.updateVariable(updatedVariableEntity);
+    }
 
 }

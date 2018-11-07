@@ -42,81 +42,81 @@ import org.mockito.Mock;
 
 public class ProcessStartedEventHandlerTest {
 
-	@InjectMocks
-	private ProcessStartedEventHandler handler;
+    @InjectMocks
+    private ProcessStartedEventHandler handler;
 
-	@Mock
-	private ProcessInstanceRepository processInstanceRepository;
+    @Mock
+    private ProcessInstanceRepository processInstanceRepository;
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-	@Test
-	public void handleShouldUpdateProcessInstanceStatusToRunning() {
-		// given
-		CloudProcessStartedEvent event = buildProcessStartedEvent();
-		ProcessInstance currentProcessInstanceEntity = mock(ProcessInstance.class);
-		given(currentProcessInstanceEntity.getStatus()).willReturn(ProcessInstance.ProcessInstanceStatus.CREATED);
-		given(processInstanceRepository.findById(event.getEntity().getId()))
-				.willReturn(Optional.of(currentProcessInstanceEntity));
+    @Test
+    public void handleShouldUpdateProcessInstanceStatusToRunning() {
+        // given
+        CloudProcessStartedEvent event = buildProcessStartedEvent();
+        ProcessInstance currentProcessInstanceEntity = mock(ProcessInstance.class);
+        given(currentProcessInstanceEntity.getStatus()).willReturn(ProcessInstance.ProcessInstanceStatus.CREATED);
+        given(processInstanceRepository.findById(event.getEntity().getId()))
+                .willReturn(Optional.of(currentProcessInstanceEntity));
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		verify(processInstanceRepository).save(currentProcessInstanceEntity);
-		verify(currentProcessInstanceEntity).setStatus(ProcessInstance.ProcessInstanceStatus.RUNNING);
-	}
+        // then
+        verify(processInstanceRepository).save(currentProcessInstanceEntity);
+        verify(currentProcessInstanceEntity).setStatus(ProcessInstance.ProcessInstanceStatus.RUNNING);
+    }
 
-	@Test
-	public void handleShouldIgnoreEventIfProcessInstanceIsAlreadyInRunningStatus() {
-		// given
-		CloudProcessStartedEvent event = buildProcessStartedEvent();
-		ProcessInstance currentProcessInstanceEntity = mock(ProcessInstance.class);
-		given(currentProcessInstanceEntity.getStatus()).willReturn(ProcessInstance.ProcessInstanceStatus.RUNNING);
-		given(processInstanceRepository.findById(event.getEntity().getId()))
-				.willReturn(Optional.of(currentProcessInstanceEntity));
+    @Test
+    public void handleShouldIgnoreEventIfProcessInstanceIsAlreadyInRunningStatus() {
+        // given
+        CloudProcessStartedEvent event = buildProcessStartedEvent();
+        ProcessInstance currentProcessInstanceEntity = mock(ProcessInstance.class);
+        given(currentProcessInstanceEntity.getStatus()).willReturn(ProcessInstance.ProcessInstanceStatus.RUNNING);
+        given(processInstanceRepository.findById(event.getEntity().getId()))
+                .willReturn(Optional.of(currentProcessInstanceEntity));
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		verify(processInstanceRepository, never()).save(currentProcessInstanceEntity);
-		verify(currentProcessInstanceEntity, never()).setStatus(ProcessInstance.ProcessInstanceStatus.RUNNING);
-	}
+        // then
+        verify(processInstanceRepository, never()).save(currentProcessInstanceEntity);
+        verify(currentProcessInstanceEntity, never()).setStatus(ProcessInstance.ProcessInstanceStatus.RUNNING);
+    }
 
-	private CloudProcessStartedEvent buildProcessStartedEvent() {
-		ProcessInstanceImpl processInstance = new ProcessInstanceImpl();
-		processInstance.setId(UUID.randomUUID().toString());
-		return new CloudProcessStartedEventImpl(processInstance);
-	}
+    private CloudProcessStartedEvent buildProcessStartedEvent() {
+        ProcessInstanceImpl processInstance = new ProcessInstanceImpl();
+        processInstance.setId(UUID.randomUUID().toString());
+        return new CloudProcessStartedEventImpl(processInstance);
+    }
 
-	@Test
-	public void handleShouldThrowExceptionWhenRelatedProcessInstanceIsNotFound() {
-		// given
-		CloudProcessStartedEvent event = buildProcessStartedEvent();
+    @Test
+    public void handleShouldThrowExceptionWhenRelatedProcessInstanceIsNotFound() {
+        // given
+        CloudProcessStartedEvent event = buildProcessStartedEvent();
 
-		given(processInstanceRepository.findById("200")).willReturn(Optional.empty());
+        given(processInstanceRepository.findById("200")).willReturn(Optional.empty());
 
-		// then
-		expectedException.expect(QueryException.class);
-		expectedException.expectMessage("Unable to find process instance with the given id: ");
+        // then
+        expectedException.expect(QueryException.class);
+        expectedException.expectMessage("Unable to find process instance with the given id: ");
 
-		// when
-		handler.handle(event);
-	}
+        // when
+        handler.handle(event);
+    }
 
-	@Test
-	public void getHandledEventShouldReturnProcessStartedEvent() {
-		// when
-		String handledEvent = handler.getHandledEvent();
+    @Test
+    public void getHandledEventShouldReturnProcessStartedEvent() {
+        // when
+        String handledEvent = handler.getHandledEvent();
 
-		// then
-		assertThat(handledEvent).isEqualTo(ProcessRuntimeEvent.ProcessEvents.PROCESS_STARTED.name());
-	}
+        // then
+        assertThat(handledEvent).isEqualTo(ProcessRuntimeEvent.ProcessEvents.PROCESS_STARTED.name());
+    }
 }

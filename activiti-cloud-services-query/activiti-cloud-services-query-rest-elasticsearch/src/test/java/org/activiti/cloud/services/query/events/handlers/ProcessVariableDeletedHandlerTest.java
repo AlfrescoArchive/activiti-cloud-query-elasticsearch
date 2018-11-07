@@ -55,88 +55,88 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProcessVariableDeletedHandlerTest {
 
-	private ProcessVariableDeletedEventHandler handler;
+    private ProcessVariableDeletedEventHandler handler;
 
-	private VariableUpdater variableUpdater;
+    private VariableUpdater variableUpdater;
 
-	@Mock
-	private ProcessInstanceRepository processInstanceRepository;
+    @Mock
+    private ProcessInstanceRepository processInstanceRepository;
 
-	@Mock
-	private TaskRepository taskRepository;
+    @Mock
+    private TaskRepository taskRepository;
 
-	@Spy
-	private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper;
 
-	@Mock
-	private ESIndexesConfiguration esIndexesConfiguration;
+    @Mock
+    private ESIndexesConfiguration esIndexesConfiguration;
 
-	@Mock
-	private Client esClient;
+    @Mock
+    private Client esClient;
 
-	@Mock
-	private DocumentFinder documentFinder;
+    @Mock
+    private DocumentFinder documentFinder;
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-		variableUpdater = spy(new VariableUpdater(processInstanceRepository, taskRepository, objectMapper,
-				esIndexesConfiguration, esClient, documentFinder));
-		handler = new ProcessVariableDeletedEventHandler(variableUpdater);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+        variableUpdater = spy(new VariableUpdater(processInstanceRepository, taskRepository, objectMapper,
+                esIndexesConfiguration, esClient, documentFinder));
+        handler = new ProcessVariableDeletedEventHandler(variableUpdater);
+    }
 
-	@Test
-	@SuppressWarnings("unchecked")
-	public void handleRemoveVariableFromProcessAndSoftDeleteIt()
-			throws JsonProcessingException, InterruptedException, ExecutionException {
-		// given
-		CloudVariableDeletedEvent event = buildVariableDeletedEvent();
-		VariableInstance variableInstance = event.getEntity();
+    @Test
+    @SuppressWarnings("unchecked")
+    public void handleRemoveVariableFromProcessAndSoftDeleteIt()
+            throws JsonProcessingException, InterruptedException, ExecutionException {
+        // given
+        CloudVariableDeletedEvent event = buildVariableDeletedEvent();
+        VariableInstance variableInstance = event.getEntity();
 
-		ProcessInstance processInstance = buildProcessInstance(variableInstance);
-		Variable processInstanceVariable = processInstance.getVariables().get(variableInstance.getType()).iterator()
-				.next();
+        ProcessInstance processInstance = buildProcessInstance(variableInstance);
+        Variable processInstanceVariable = processInstance.getVariables().get(variableInstance.getType()).iterator()
+                .next();
 
-		String notFoundMessage = "Unable to find process instance with the given id: "
-				+ variableInstance.getProcessInstanceId();
-		when(documentFinder.findById(processInstanceRepository, variableInstance.getProcessInstanceId(),
-				notFoundMessage)).thenReturn(processInstance);
+        String notFoundMessage = "Unable to find process instance with the given id: "
+                + variableInstance.getProcessInstanceId();
+        when(documentFinder.findById(processInstanceRepository, variableInstance.getProcessInstanceId(),
+                notFoundMessage)).thenReturn(processInstance);
 
-		ActionFuture<UpdateResponse> actionFuture = mock(ActionFuture.class);
-		UpdateResponse updateResponse = mock(UpdateResponse.class);
-		when(actionFuture.get()).thenReturn(updateResponse);
-		when(esClient.update(ArgumentMatchers.any(UpdateRequest.class))).thenReturn(actionFuture);
+        ActionFuture<UpdateResponse> actionFuture = mock(ActionFuture.class);
+        UpdateResponse updateResponse = mock(UpdateResponse.class);
+        when(actionFuture.get()).thenReturn(updateResponse);
+        when(esClient.update(ArgumentMatchers.any(UpdateRequest.class))).thenReturn(actionFuture);
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		verify(variableUpdater).markVariableAsDeleted(variableInstance);
-		assertThat(processInstanceVariable.getMarkedAsDeleted()).isTrue();
-	}
+        // then
+        verify(variableUpdater).markVariableAsDeleted(variableInstance);
+        assertThat(processInstanceVariable.getMarkedAsDeleted()).isTrue();
+    }
 
-	private ProcessInstance buildProcessInstance(VariableInstance variableInstance) {
-		ProcessInstance processInstance = new ProcessInstance();
-		Map<String, Set<Variable>> variables = new HashMap<>();
+    private ProcessInstance buildProcessInstance(VariableInstance variableInstance) {
+        ProcessInstance processInstance = new ProcessInstance();
+        Map<String, Set<Variable>> variables = new HashMap<>();
 
-		Variable variable = new Variable();
-		variable.setProcessInstanceId(variableInstance.getProcessInstanceId());
-		variable.setName(variableInstance.getName());
-		variable.setType(variableInstance.getType());
-		variable.setTaskId(variableInstance.getTaskId());
-		variable.setValue(variableInstance.getValue());
+        Variable variable = new Variable();
+        variable.setProcessInstanceId(variableInstance.getProcessInstanceId());
+        variable.setName(variableInstance.getName());
+        variable.setType(variableInstance.getType());
+        variable.setTaskId(variableInstance.getTaskId());
+        variable.setValue(variableInstance.getValue());
 
-		Set<Variable> variablesSet = new HashSet<>();
-		variablesSet.add(variable);
-		variables.put(variable.getType(), variablesSet);
-		processInstance.setVariables(variables);
+        Set<Variable> variablesSet = new HashSet<>();
+        variablesSet.add(variable);
+        variables.put(variable.getType(), variablesSet);
+        processInstance.setVariables(variables);
 
-		return processInstance;
-	}
+        return processInstance;
+    }
 
-	private CloudVariableDeletedEvent buildVariableDeletedEvent() {
-		return new CloudVariableDeletedEventImpl(
-				new VariableInstanceImpl<>("var", "string", "test", UUID.randomUUID().toString()));
-	}
+    private CloudVariableDeletedEvent buildVariableDeletedEvent() {
+        return new CloudVariableDeletedEventImpl(
+                new VariableInstanceImpl<>("var", "string", "test", UUID.randomUUID().toString()));
+    }
 
 }

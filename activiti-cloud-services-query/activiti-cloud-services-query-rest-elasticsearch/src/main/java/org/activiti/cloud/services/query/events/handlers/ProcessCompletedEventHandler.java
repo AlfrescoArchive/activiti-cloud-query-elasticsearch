@@ -34,33 +34,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessCompletedEventHandler implements QueryEventHandler {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(ProcessCompletedEventHandler.class);
-	
-	private ProcessInstanceRepository processInstanceRepository;
+    private static Logger LOGGER = LoggerFactory.getLogger(ProcessCompletedEventHandler.class);
 
-	@Autowired
-	public ProcessCompletedEventHandler(ProcessInstanceRepository processInstanceRepository) {
-		this.processInstanceRepository = processInstanceRepository;
-	}
+    private ProcessInstanceRepository processInstanceRepository;
 
-	@Override
-	public void handle(CloudRuntimeEvent<?, ?> event) {
-		CloudProcessCompletedEvent completedEvent = (CloudProcessCompletedEvent) event;
-		String processInstanceId = completedEvent.getEntity().getId();
-		LOGGER.debug("Handling completed process Instance " + processInstanceId);
-		Optional<ProcessInstance> findResult = processInstanceRepository.findById(processInstanceId);
-		if (findResult.isPresent()) {
-			ProcessInstance processInstance = findResult.get();
-			processInstance.setStatus(ProcessInstance.ProcessInstanceStatus.COMPLETED);
-			processInstance.setLastModified(new Date(completedEvent.getTimestamp()));
-			processInstanceRepository.save(processInstance);
-		} else {
-			throw new QueryException("Unable to find process instance with the given id: " + processInstanceId);
-		}
-	}
+    @Autowired
+    public ProcessCompletedEventHandler(ProcessInstanceRepository processInstanceRepository) {
+        this.processInstanceRepository = processInstanceRepository;
+    }
 
-	@Override
-	public String getHandledEvent() {
-		return ProcessRuntimeEvent.ProcessEvents.PROCESS_COMPLETED.name();
-	}
+    @Override
+    public void handle(CloudRuntimeEvent<?, ?> event) {
+        CloudProcessCompletedEvent completedEvent = (CloudProcessCompletedEvent) event;
+        String processInstanceId = completedEvent.getEntity().getId();
+        LOGGER.debug("Handling completed process Instance " + processInstanceId);
+        Optional<ProcessInstance> findResult = processInstanceRepository.findById(processInstanceId);
+        if (findResult.isPresent()) {
+            ProcessInstance processInstance = findResult.get();
+            processInstance.setStatus(ProcessInstance.ProcessInstanceStatus.COMPLETED);
+            processInstance.setLastModified(new Date(completedEvent.getTimestamp()));
+            processInstanceRepository.save(processInstance);
+        } else {
+            throw new QueryException("Unable to find process instance with the given id: " + processInstanceId);
+        }
+    }
+
+    @Override
+    public String getHandledEvent() {
+        return ProcessRuntimeEvent.ProcessEvents.PROCESS_COMPLETED.name();
+    }
 }

@@ -52,191 +52,191 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class VariableUpdaterTest {
 
-	@InjectMocks
-	private VariableUpdater updater;
+    @InjectMocks
+    private VariableUpdater updater;
 
-	@Mock
-	private ProcessInstanceRepository processInstanceRepository;
-	@Mock
-	private TaskRepository taskRepository;
-	@Spy
-	private ObjectMapper objectMapper = new ObjectMapper();
-	@Mock
-	private ESIndexesConfiguration esIndexesConfiguration;
-	@Mock
-	private Client esClient;
-	@Mock
-	private DocumentFinder documentFinder;
+    @Mock
+    private ProcessInstanceRepository processInstanceRepository;
+    @Mock
+    private TaskRepository taskRepository;
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
+    @Mock
+    private ESIndexesConfiguration esIndexesConfiguration;
+    @Mock
+    private Client esClient;
+    @Mock
+    private DocumentFinder documentFinder;
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-	@Test
-	public void updateVariableShouldUpdateVariableRetrievedFromProcessInstanceRepository()
-			throws InterruptedException, ExecutionException {
-		// given
-		ProcessInstance processInstance = buildProcessInstance();
-		String processInstanceId = processInstance.getId();
+    @Test
+    public void updateVariableShouldUpdateVariableRetrievedFromProcessInstanceRepository()
+            throws InterruptedException, ExecutionException {
+        // given
+        ProcessInstance processInstance = buildProcessInstance();
+        String processInstanceId = processInstance.getId();
 
-		Variable currentVariable = processInstance.getVariables().get("string").iterator().next();
+        Variable currentVariable = processInstance.getVariables().get("string").iterator().next();
 
-		Date now = new Date();
-		Variable updatedVariable = buildUpdatedVariable(currentVariable, now);
-		updatedVariable.setProcessInstanceId(processInstanceId);
+        Date now = new Date();
+        Variable updatedVariable = buildUpdatedVariable(currentVariable, now);
+        updatedVariable.setProcessInstanceId(processInstanceId);
 
-		String notFoundMessage = "Unable to find process instance with the given id: " + processInstanceId;
-		when(documentFinder.findById(processInstanceRepository, processInstanceId, notFoundMessage))
-				.thenReturn(processInstance);
+        String notFoundMessage = "Unable to find process instance with the given id: " + processInstanceId;
+        when(documentFinder.findById(processInstanceRepository, processInstanceId, notFoundMessage))
+                .thenReturn(processInstance);
 
-		setUpUpdate();
+        setUpUpdate();
 
-		// when
-		updater.updateVariable(updatedVariable);
+        // when
+        updater.updateVariable(updatedVariable);
 
-		// then
-		assertThat(currentVariable).hasType("string").hasValue("content").hasLastUpdatedTime(now);
-		verify(esClient).update(ArgumentMatchers.any(UpdateRequest.class));
-	}
+        // then
+        assertThat(currentVariable).hasType("string").hasValue("content").hasLastUpdatedTime(now);
+        verify(esClient).update(ArgumentMatchers.any(UpdateRequest.class));
+    }
 
-	private ProcessInstance buildProcessInstance() {
-		String processInstanceId = "processInstanceId";
-		ProcessInstance processInstance = new ProcessInstance();
-		processInstance.setId(processInstanceId);
-		Map<String, Set<Variable>> variables = new HashMap<>();
+    private ProcessInstance buildProcessInstance() {
+        String processInstanceId = "processInstanceId";
+        ProcessInstance processInstance = new ProcessInstance();
+        processInstance.setId(processInstanceId);
+        Map<String, Set<Variable>> variables = new HashMap<>();
 
-		Variable variable = buildVariable(processInstanceId, null);
+        Variable variable = buildVariable(processInstanceId, null);
 
-		Set<Variable> variablesSet = new HashSet<>();
-		variablesSet.add(variable);
-		variables.put(variable.getType(), variablesSet);
-		processInstance.setVariables(variables);
+        Set<Variable> variablesSet = new HashSet<>();
+        variablesSet.add(variable);
+        variables.put(variable.getType(), variablesSet);
+        processInstance.setVariables(variables);
 
-		return processInstance;
-	}
+        return processInstance;
+    }
 
-	private Variable buildVariable(String processInstanceId, String taskId) {
-		Variable variable = new Variable();
-		variable.setProcessInstanceId(processInstanceId);
-		variable.setTaskId(taskId);
-		variable.setName("var");
-		variable.setType("string");
-		Calendar c = Calendar.getInstance();
-		c.set(Calendar.YEAR, 1986);
-		c.set(Calendar.MONTH, 6);
-		c.set(Calendar.DAY_OF_MONTH, 15);
-		variable.setLastUpdatedTime(c.getTime());
-		variable.setValue("oldValue");
+    private Variable buildVariable(String processInstanceId, String taskId) {
+        Variable variable = new Variable();
+        variable.setProcessInstanceId(processInstanceId);
+        variable.setTaskId(taskId);
+        variable.setName("var");
+        variable.setType("string");
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.YEAR, 1986);
+        c.set(Calendar.MONTH, 6);
+        c.set(Calendar.DAY_OF_MONTH, 15);
+        variable.setLastUpdatedTime(c.getTime());
+        variable.setValue("oldValue");
 
-		return variable;
-	}
+        return variable;
+    }
 
-	private Variable buildUpdatedVariable(Variable currentVariable, Date now) {
-		Variable updatedVariable = new Variable();
-		updatedVariable.setType(currentVariable.getType());
-		updatedVariable.setValue("content");
-		updatedVariable.setLastUpdatedTime(now);
-		updatedVariable.setName(currentVariable.getName());
-		return updatedVariable;
-	}
+    private Variable buildUpdatedVariable(Variable currentVariable, Date now) {
+        Variable updatedVariable = new Variable();
+        updatedVariable.setType(currentVariable.getType());
+        updatedVariable.setValue("content");
+        updatedVariable.setLastUpdatedTime(now);
+        updatedVariable.setName(currentVariable.getName());
+        return updatedVariable;
+    }
 
-	@SuppressWarnings("unchecked")
-	private void setUpUpdate() throws InterruptedException, ExecutionException {
-		ActionFuture<UpdateResponse> actionFuture = mock(ActionFuture.class);
-		UpdateResponse updateResponse = mock(UpdateResponse.class);
-		when(actionFuture.get()).thenReturn(updateResponse);
-		when(esClient.update(ArgumentMatchers.any(UpdateRequest.class))).thenReturn(actionFuture);
-	}
+    @SuppressWarnings("unchecked")
+    private void setUpUpdate() throws InterruptedException, ExecutionException {
+        ActionFuture<UpdateResponse> actionFuture = mock(ActionFuture.class);
+        UpdateResponse updateResponse = mock(UpdateResponse.class);
+        when(actionFuture.get()).thenReturn(updateResponse);
+        when(esClient.update(ArgumentMatchers.any(UpdateRequest.class))).thenReturn(actionFuture);
+    }
 
-	@Test
-	public void updateVariableShouldUpdateVariableRetrievedFromTaskRepository()
-			throws InterruptedException, ExecutionException {
-		// given
-		Task task = buildTask();
-		String taskId = task.getId();
+    @Test
+    public void updateVariableShouldUpdateVariableRetrievedFromTaskRepository()
+            throws InterruptedException, ExecutionException {
+        // given
+        Task task = buildTask();
+        String taskId = task.getId();
 
-		Variable currentVariable = task.getVariables().get("string").iterator().next();
+        Variable currentVariable = task.getVariables().get("string").iterator().next();
 
-		Date now = new Date();
-		Variable updatedVariable = buildUpdatedVariable(currentVariable, now);
-		updatedVariable.setTaskId(taskId);
+        Date now = new Date();
+        Variable updatedVariable = buildUpdatedVariable(currentVariable, now);
+        updatedVariable.setTaskId(taskId);
 
-		String notFoundMessage = "Unable to find task with the given id: " + taskId;
-		when(documentFinder.findById(taskRepository, taskId, notFoundMessage)).thenReturn(task);
+        String notFoundMessage = "Unable to find task with the given id: " + taskId;
+        when(documentFinder.findById(taskRepository, taskId, notFoundMessage)).thenReturn(task);
 
-		setUpUpdate();
+        setUpUpdate();
 
-		// when
-		updater.updateVariable(updatedVariable);
+        // when
+        updater.updateVariable(updatedVariable);
 
-		// then
-		assertThat(currentVariable).hasType("string").hasValue("content").hasLastUpdatedTime(now);
-		verify(esClient).update(ArgumentMatchers.any(UpdateRequest.class));
-	}
+        // then
+        assertThat(currentVariable).hasType("string").hasValue("content").hasLastUpdatedTime(now);
+        verify(esClient).update(ArgumentMatchers.any(UpdateRequest.class));
+    }
 
-	@Test
-	public void markVariableAsDeletedShouldWorkForProcessInstance() throws InterruptedException, ExecutionException {
-		// given
-		ProcessInstance processInstance = buildProcessInstance();
-		String processInstanceId = processInstance.getId();
+    @Test
+    public void markVariableAsDeletedShouldWorkForProcessInstance() throws InterruptedException, ExecutionException {
+        // given
+        ProcessInstance processInstance = buildProcessInstance();
+        String processInstanceId = processInstance.getId();
 
-		Variable currentVariable = processInstance.getVariables().get("string").iterator().next();
+        Variable currentVariable = processInstance.getVariables().get("string").iterator().next();
 
-		Variable updatedVariable = buildUpdatedVariable(currentVariable, new Date());
-		updatedVariable.setProcessInstanceId(processInstanceId);
+        Variable updatedVariable = buildUpdatedVariable(currentVariable, new Date());
+        updatedVariable.setProcessInstanceId(processInstanceId);
 
-		String notFoundMessage = "Unable to find process instance with the given id: " + processInstanceId;
-		when(documentFinder.findById(processInstanceRepository, processInstanceId, notFoundMessage))
-				.thenReturn(processInstance);
+        String notFoundMessage = "Unable to find process instance with the given id: " + processInstanceId;
+        when(documentFinder.findById(processInstanceRepository, processInstanceId, notFoundMessage))
+                .thenReturn(processInstance);
 
-		setUpUpdate();
+        setUpUpdate();
 
-		// when
-		updater.markVariableAsDeleted(updatedVariable);
+        // when
+        updater.markVariableAsDeleted(updatedVariable);
 
-		// then
-		assertThat(currentVariable).hasMarkedAsDeleted(true);
-		verify(esClient).update(ArgumentMatchers.any(UpdateRequest.class));
-	}
+        // then
+        assertThat(currentVariable).hasMarkedAsDeleted(true);
+        verify(esClient).update(ArgumentMatchers.any(UpdateRequest.class));
+    }
 
-	@Test
-	public void markVariableAsDeletedShouldWorkForTask() throws InterruptedException, ExecutionException {
-		// given
-		Task task = buildTask();
-		String taskId = task.getId();
+    @Test
+    public void markVariableAsDeletedShouldWorkForTask() throws InterruptedException, ExecutionException {
+        // given
+        Task task = buildTask();
+        String taskId = task.getId();
 
-		Variable currentVariable = task.getVariables().get("string").iterator().next();
+        Variable currentVariable = task.getVariables().get("string").iterator().next();
 
-		Variable updatedVariable = buildUpdatedVariable(currentVariable, new Date());
-		updatedVariable.setTaskId(taskId);
+        Variable updatedVariable = buildUpdatedVariable(currentVariable, new Date());
+        updatedVariable.setTaskId(taskId);
 
-		String notFoundMessage = "Unable to find task with the given id: " + taskId;
-		when(documentFinder.findById(taskRepository, taskId, notFoundMessage)).thenReturn(task);
+        String notFoundMessage = "Unable to find task with the given id: " + taskId;
+        when(documentFinder.findById(taskRepository, taskId, notFoundMessage)).thenReturn(task);
 
-		setUpUpdate();
+        setUpUpdate();
 
-		// when
-		updater.markVariableAsDeleted(updatedVariable);
+        // when
+        updater.markVariableAsDeleted(updatedVariable);
 
-		// then
-		assertThat(currentVariable).hasMarkedAsDeleted(true);
-		verify(esClient).update(ArgumentMatchers.any(UpdateRequest.class));
-	}
+        // then
+        assertThat(currentVariable).hasMarkedAsDeleted(true);
+        verify(esClient).update(ArgumentMatchers.any(UpdateRequest.class));
+    }
 
-	private Task buildTask() {
-		String taskId = "taskId";
-		Task task = new Task();
-		task.setId(taskId);
-		Map<String, Set<Variable>> variables = new HashMap<>();
+    private Task buildTask() {
+        String taskId = "taskId";
+        Task task = new Task();
+        task.setId(taskId);
+        Map<String, Set<Variable>> variables = new HashMap<>();
 
-		Variable variable = buildVariable(null, taskId);
-		Set<Variable> variablesSet = new HashSet<>();
-		variablesSet.add(variable);
-		variables.put(variable.getType(), variablesSet);
-		task.setVariables(variables);
+        Variable variable = buildVariable(null, taskId);
+        Set<Variable> variablesSet = new HashSet<>();
+        variablesSet.add(variable);
+        variables.put(variable.getType(), variablesSet);
+        task.setVariables(variables);
 
-		return task;
-	}
+        return task;
+    }
 
 }

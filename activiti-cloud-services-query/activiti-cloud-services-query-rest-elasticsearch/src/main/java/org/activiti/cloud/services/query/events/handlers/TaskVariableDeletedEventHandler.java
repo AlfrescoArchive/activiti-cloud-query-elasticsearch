@@ -25,16 +25,16 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskVariableDeletedEventHandler {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(TaskVariableDeletedEventHandler.class);
-	private VariableUpdater variableUpdater;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskVariableDeletedEventHandler.class);
+    private VariableUpdater variableUpdater;
 
-	@Autowired
-	public TaskVariableDeletedEventHandler(VariableUpdater variableUpdater) {
-		this.variableUpdater = variableUpdater;
-	}
+    @Autowired
+    public TaskVariableDeletedEventHandler(VariableUpdater variableUpdater) {
+        this.variableUpdater = variableUpdater;
+    }
 
-	public void handle(CloudVariableDeletedEvent event) {
-		LOGGER.debug("Handling task variable deleted event: " + event.getEntity().getName());
-		variableUpdater.markVariableAsDeleted(event.getEntity());
-	}
+    public void handle(CloudVariableDeletedEvent event) {
+        LOGGER.debug("Handling task variable deleted event: " + event.getEntity().getName());
+        variableUpdater.markVariableAsDeleted(event.getEntity());
+    }
 }

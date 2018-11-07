@@ -43,68 +43,68 @@ import org.mockito.Mock;
 
 public class TaskAssignedEventHandlerTest {
 
-	@InjectMocks
-	private TaskAssignedEventHandler handler;
+    @InjectMocks
+    private TaskAssignedEventHandler handler;
 
-	@Mock
-	private TaskRepository taskRepository;
+    @Mock
+    private TaskRepository taskRepository;
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-	@Test
-	public void handleShouldUpdateTaskStatusToAssigned() {
-		// given
-		CloudTaskAssignedEvent event = buildTaskAssignedEvent();
+    @Test
+    public void handleShouldUpdateTaskStatusToAssigned() {
+        // given
+        CloudTaskAssignedEvent event = buildTaskAssignedEvent();
 
-		String taskId = event.getEntity().getId();
-		Task taskEntity = aTask().withId(taskId).withAssignee("previousUser").build();
+        String taskId = event.getEntity().getId();
+        Task taskEntity = aTask().withId(taskId).withAssignee("previousUser").build();
 
-		given(taskRepository.findById(taskId)).willReturn(Optional.of(taskEntity));
+        given(taskRepository.findById(taskId)).willReturn(Optional.of(taskEntity));
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		verify(taskRepository).save(taskEntity);
-		verify(taskEntity).setStatus(Task.TaskStatus.ASSIGNED);
-		verify(taskEntity).setAssignee(event.getEntity().getAssignee());
-		verify(taskEntity).setLastModified(any(Date.class));
-	}
+        // then
+        verify(taskRepository).save(taskEntity);
+        verify(taskEntity).setStatus(Task.TaskStatus.ASSIGNED);
+        verify(taskEntity).setAssignee(event.getEntity().getAssignee());
+        verify(taskEntity).setLastModified(any(Date.class));
+    }
 
-	private CloudTaskAssignedEvent buildTaskAssignedEvent() {
-		TaskImpl task = new TaskImpl(UUID.randomUUID().toString(), "task", Task.TaskStatus.ASSIGNED);
-		task.setAssignee("user");
-		return new CloudTaskAssignedEventImpl(task);
-	}
+    private CloudTaskAssignedEvent buildTaskAssignedEvent() {
+        TaskImpl task = new TaskImpl(UUID.randomUUID().toString(), "task", Task.TaskStatus.ASSIGNED);
+        task.setAssignee("user");
+        return new CloudTaskAssignedEventImpl(task);
+    }
 
-	@Test
-	public void handleShouldThrowExceptionWhenNoTaskIsFoundForTheGivenId() {
-		// given
-		CloudTaskAssignedEvent event = buildTaskAssignedEvent();
+    @Test
+    public void handleShouldThrowExceptionWhenNoTaskIsFoundForTheGivenId() {
+        // given
+        CloudTaskAssignedEvent event = buildTaskAssignedEvent();
 
-		String taskId = event.getEntity().getId();
-		given(taskRepository.findById(taskId)).willReturn(Optional.empty());
+        String taskId = event.getEntity().getId();
+        given(taskRepository.findById(taskId)).willReturn(Optional.empty());
 
-		// then
-		expectedException.expect(QueryException.class);
-		expectedException.expectMessage("Unable to find task with id: " + taskId);
+        // then
+        expectedException.expect(QueryException.class);
+        expectedException.expectMessage("Unable to find task with id: " + taskId);
 
-		// when
-		handler.handle(event);
-	}
+        // when
+        handler.handle(event);
+    }
 
-	@Test
-	public void getHandledEventShouldReturnTaskAssignedEvent() {
-		// when
-		String handledEvent = handler.getHandledEvent();
+    @Test
+    public void getHandledEventShouldReturnTaskAssignedEvent() {
+        // when
+        String handledEvent = handler.getHandledEvent();
 
-		// then
-		assertThat(handledEvent).isEqualTo(TaskRuntimeEvent.TaskEvents.TASK_ASSIGNED.name());
-	}
+        // then
+        assertThat(handledEvent).isEqualTo(TaskRuntimeEvent.TaskEvents.TASK_ASSIGNED.name());
+    }
 }

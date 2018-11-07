@@ -25,17 +25,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskVariableUpdatedEventHandler {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(TaskVariableUpdatedEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskVariableUpdatedEventHandler.class);
 
-	private final VariableUpdater variableUpdater;
+    private final VariableUpdater variableUpdater;
 
-	@Autowired
-	public TaskVariableUpdatedEventHandler(VariableUpdater variableUpdater) {
-		this.variableUpdater = variableUpdater;
-	}
+    @Autowired
+    public TaskVariableUpdatedEventHandler(VariableUpdater variableUpdater) {
+        this.variableUpdater = variableUpdater;
+    }
 
-	public void handle(Variable updatedVariableEntity) {
-		LOGGER.debug("Handling task variable updated event: " + updatedVariableEntity.getName());
-		variableUpdater.updateVariable(updatedVariableEntity);
-	}
+    public void handle(Variable updatedVariableEntity) {
+        LOGGER.debug("Handling task variable updated event: " + updatedVariableEntity.getName());
+        variableUpdater.updateVariable(updatedVariableEntity);
+    }
 }

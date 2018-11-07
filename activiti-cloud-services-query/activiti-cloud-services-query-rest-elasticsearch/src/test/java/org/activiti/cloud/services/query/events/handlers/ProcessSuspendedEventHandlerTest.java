@@ -43,65 +43,65 @@ import org.mockito.Mock;
 
 public class ProcessSuspendedEventHandlerTest {
 
-	@InjectMocks
-	private ProcessSuspendedEventHandler handler;
+    @InjectMocks
+    private ProcessSuspendedEventHandler handler;
 
-	@Mock
-	private ProcessInstanceRepository processInstanceRepository;
+    @Mock
+    private ProcessInstanceRepository processInstanceRepository;
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-	@Test
-	public void handleShouldUpdateCurrentProcessInstanceStateToSuspended() {
-		// given
-		CloudProcessSuspendedEvent event = buildProcessSuspendedEvent();
+    @Test
+    public void handleShouldUpdateCurrentProcessInstanceStateToSuspended() {
+        // given
+        CloudProcessSuspendedEvent event = buildProcessSuspendedEvent();
 
-		ProcessInstance currentProcessInstanceEntity = mock(ProcessInstance.class);
-		given(processInstanceRepository.findById(event.getEntity().getId()))
-				.willReturn(Optional.of(currentProcessInstanceEntity));
+        ProcessInstance currentProcessInstanceEntity = mock(ProcessInstance.class);
+        given(processInstanceRepository.findById(event.getEntity().getId()))
+                .willReturn(Optional.of(currentProcessInstanceEntity));
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		verify(processInstanceRepository).save(currentProcessInstanceEntity);
-		verify(currentProcessInstanceEntity).setStatus(ProcessInstance.ProcessInstanceStatus.SUSPENDED);
-		verify(currentProcessInstanceEntity).setLastModified(any(Date.class));
-	}
+        // then
+        verify(processInstanceRepository).save(currentProcessInstanceEntity);
+        verify(currentProcessInstanceEntity).setStatus(ProcessInstance.ProcessInstanceStatus.SUSPENDED);
+        verify(currentProcessInstanceEntity).setLastModified(any(Date.class));
+    }
 
-	private CloudProcessSuspendedEvent buildProcessSuspendedEvent() {
-		ProcessInstanceImpl processInstance = new ProcessInstanceImpl();
-		processInstance.setId(UUID.randomUUID().toString());
-		return new CloudProcessSuspendedEventImpl(processInstance);
-	}
+    private CloudProcessSuspendedEvent buildProcessSuspendedEvent() {
+        ProcessInstanceImpl processInstance = new ProcessInstanceImpl();
+        processInstance.setId(UUID.randomUUID().toString());
+        return new CloudProcessSuspendedEventImpl(processInstance);
+    }
 
-	@Test
-	public void handleShouldThrowExceptionWhenRelatedProcessInstanceIsNotFound() {
-		// given
-		CloudProcessSuspendedEvent event = buildProcessSuspendedEvent();
+    @Test
+    public void handleShouldThrowExceptionWhenRelatedProcessInstanceIsNotFound() {
+        // given
+        CloudProcessSuspendedEvent event = buildProcessSuspendedEvent();
 
-		given(processInstanceRepository.findById("200")).willReturn(Optional.empty());
+        given(processInstanceRepository.findById("200")).willReturn(Optional.empty());
 
-		// then
-		expectedException.expect(QueryException.class);
-		expectedException.expectMessage("Unable to find process instance with the given id: ");
+        // then
+        expectedException.expect(QueryException.class);
+        expectedException.expectMessage("Unable to find process instance with the given id: ");
 
-		// when
-		handler.handle(event);
-	}
+        // when
+        handler.handle(event);
+    }
 
-	@Test
-	public void getHandledEventShouldReturnProcessSuspendedEvent() {
-		// when
-		String handledEvent = handler.getHandledEvent();
+    @Test
+    public void getHandledEventShouldReturnProcessSuspendedEvent() {
+        // when
+        String handledEvent = handler.getHandledEvent();
 
-		// then
-		assertThat(handledEvent).isEqualTo(ProcessRuntimeEvent.ProcessEvents.PROCESS_SUSPENDED.name());
-	}
+        // then
+        assertThat(handledEvent).isEqualTo(ProcessRuntimeEvent.ProcessEvents.PROCESS_SUSPENDED.name());
+    }
 }

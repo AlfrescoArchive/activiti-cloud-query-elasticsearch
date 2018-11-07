@@ -54,79 +54,79 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class TaskVariableDeletedEventHandlerTest {
 
-	private TaskVariableDeletedEventHandler handler;
+    private TaskVariableDeletedEventHandler handler;
 
-	private VariableUpdater variableUpdater;
+    private VariableUpdater variableUpdater;
 
-	@Mock
-	private ProcessInstanceRepository processInstanceRepository;
+    @Mock
+    private ProcessInstanceRepository processInstanceRepository;
 
-	@Mock
-	private TaskRepository taskRepository;
+    @Mock
+    private TaskRepository taskRepository;
 
-	@Spy
-	private ObjectMapper objectMapper;
+    @Spy
+    private ObjectMapper objectMapper;
 
-	@Mock
-	private ESIndexesConfiguration esIndexesConfiguration;
+    @Mock
+    private ESIndexesConfiguration esIndexesConfiguration;
 
-	@Mock
-	private Client esClient;
+    @Mock
+    private Client esClient;
 
-	@Mock
-	private DocumentFinder documentFinder;
+    @Mock
+    private DocumentFinder documentFinder;
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-		variableUpdater = spy(new VariableUpdater(processInstanceRepository, taskRepository, objectMapper,
-				esIndexesConfiguration, esClient, documentFinder));
-		handler = new TaskVariableDeletedEventHandler(variableUpdater);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+        variableUpdater = spy(new VariableUpdater(processInstanceRepository, taskRepository, objectMapper,
+                esIndexesConfiguration, esClient, documentFinder));
+        handler = new TaskVariableDeletedEventHandler(variableUpdater);
+    }
 
-	@Test
-	@SuppressWarnings("unchecked")
-	public void handleShouldSoftDeleteIt() throws JsonProcessingException, InterruptedException, ExecutionException {
-		// given
-		VariableInstanceImpl<String> variableInstance = new VariableInstanceImpl<>("var", "string", "v1",
-				UUID.randomUUID().toString());
-		variableInstance.setTaskId(UUID.randomUUID().toString());
-		CloudVariableDeletedEventImpl event = new CloudVariableDeletedEventImpl(variableInstance);
+    @Test
+    @SuppressWarnings("unchecked")
+    public void handleShouldSoftDeleteIt() throws JsonProcessingException, InterruptedException, ExecutionException {
+        // given
+        VariableInstanceImpl<String> variableInstance = new VariableInstanceImpl<>("var", "string", "v1",
+                UUID.randomUUID().toString());
+        variableInstance.setTaskId(UUID.randomUUID().toString());
+        CloudVariableDeletedEventImpl event = new CloudVariableDeletedEventImpl(variableInstance);
 
-		Task task = buildTask(variableInstance);
-		Variable variable = task.getVariables().get(variableInstance.getType()).iterator().next();
-		String notFoundMessage = "Unable to find task with the given id: " + variableInstance.getTaskId();
-		when(documentFinder.findById(taskRepository, variableInstance.getTaskId(), notFoundMessage)).thenReturn(task);
+        Task task = buildTask(variableInstance);
+        Variable variable = task.getVariables().get(variableInstance.getType()).iterator().next();
+        String notFoundMessage = "Unable to find task with the given id: " + variableInstance.getTaskId();
+        when(documentFinder.findById(taskRepository, variableInstance.getTaskId(), notFoundMessage)).thenReturn(task);
 
-		ActionFuture<UpdateResponse> actionFuture = mock(ActionFuture.class);
-		UpdateResponse updateResponse = mock(UpdateResponse.class);
-		when(actionFuture.get()).thenReturn(updateResponse);
-		when(esClient.update(ArgumentMatchers.any(UpdateRequest.class))).thenReturn(actionFuture);
+        ActionFuture<UpdateResponse> actionFuture = mock(ActionFuture.class);
+        UpdateResponse updateResponse = mock(UpdateResponse.class);
+        when(actionFuture.get()).thenReturn(updateResponse);
+        when(esClient.update(ArgumentMatchers.any(UpdateRequest.class))).thenReturn(actionFuture);
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		verify(variableUpdater).markVariableAsDeleted(variableInstance);
-		assertThat(variable.getMarkedAsDeleted()).isTrue();
-	}
+        // then
+        verify(variableUpdater).markVariableAsDeleted(variableInstance);
+        assertThat(variable.getMarkedAsDeleted()).isTrue();
+    }
 
-	private Task buildTask(VariableInstance variableInstance) {
-		Task task = new Task();
-		Map<String, Set<Variable>> variables = new HashMap<>();
+    private Task buildTask(VariableInstance variableInstance) {
+        Task task = new Task();
+        Map<String, Set<Variable>> variables = new HashMap<>();
 
-		Variable variable = new Variable();
-		variable.setProcessInstanceId(variableInstance.getProcessInstanceId());
-		variable.setName(variableInstance.getName());
-		variable.setType(variableInstance.getType());
-		variable.setTaskId(variableInstance.getTaskId());
-		variable.setValue(variableInstance.getValue());
+        Variable variable = new Variable();
+        variable.setProcessInstanceId(variableInstance.getProcessInstanceId());
+        variable.setName(variableInstance.getName());
+        variable.setType(variableInstance.getType());
+        variable.setTaskId(variableInstance.getTaskId());
+        variable.setValue(variableInstance.getValue());
 
-		Set<Variable> variablesSet = new HashSet<>();
-		variablesSet.add(variable);
-		variables.put(variable.getType(), variablesSet);
-		task.setVariables(variables);
+        Set<Variable> variablesSet = new HashSet<>();
+        variablesSet.add(variable);
+        variables.put(variable.getType(), variablesSet);
+        task.setVariables(variables);
 
-		return task;
-	}
+        return task;
+    }
 }

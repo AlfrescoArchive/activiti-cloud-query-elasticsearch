@@ -58,133 +58,134 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class VariableCreatedEventHandlerTest {
 
-	private static final String PROCESS_INSTANCE_INDEX = "process_instance";
-	private static final String TASK_INDEX = "task";
-	private static final String DOC_TYPE = "_doc";
+    private static final String PROCESS_INSTANCE_INDEX = "process_instance";
+    private static final String TASK_INDEX = "task";
+    private static final String DOC_TYPE = "_doc";
 
-	@InjectMocks
-	private VariableCreatedEventHandler handler;
+    @InjectMocks
+    private VariableCreatedEventHandler handler;
 
-	@Mock
-	private ProcessInstanceRepository processInstanceRepository;
+    @Mock
+    private ProcessInstanceRepository processInstanceRepository;
 
-	@Mock
-	private TaskRepository taskRepository;
+    @Mock
+    private TaskRepository taskRepository;
 
-	@Mock
-	private ESIndexesConfiguration esIndexesConfiguration;
+    @Mock
+    private ESIndexesConfiguration esIndexesConfiguration;
 
-	@Spy
-	private ObjectMapper objectMapper = new ObjectMapper();
+    @Spy
+    private ObjectMapper objectMapper = new ObjectMapper();
 
-	@Mock
-	private Client esClient;
+    @Mock
+    private Client esClient;
 
-	@Before
-	public void setUp() {
-		// Next configuratuon id because variable instances have the field taskVariable (from isTaskVariable)
-		// that can't be mapped to any property...
-		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        // Next configuratuon id because variable instances have the field taskVariable
+        // (from isTaskVariable)
+        // that can't be mapped to any property...
+        objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        initMocks(this);
+    }
 
-	@Test
-	public void handleShouldCreateAndStoreProcessInstanceVariable() throws InterruptedException, ExecutionException {
-		// given
-		VariableInstanceImpl<String> variableInstance = buildVariable();
-		CloudVariableCreatedEventImpl event = new CloudVariableCreatedEventImpl(variableInstance);
+    @Test
+    public void handleShouldCreateAndStoreProcessInstanceVariable() throws InterruptedException, ExecutionException {
+        // given
+        VariableInstanceImpl<String> variableInstance = buildVariable();
+        CloudVariableCreatedEventImpl event = new CloudVariableCreatedEventImpl(variableInstance);
 
-		setUpMocks(variableInstance, event);
-		setUpUpdateExecution();
-		// when
-		handler.handle(event);
+        setUpMocks(variableInstance, event);
+        setUpUpdateExecution();
+        // when
+        handler.handle(event);
 
-		// then
-		Variable variableCreated = verifyUpdateAndGetVariableCreated(variableInstance, PROCESS_INSTANCE_INDEX);
+        // then
+        Variable variableCreated = verifyUpdateAndGetVariableCreated(variableInstance, PROCESS_INSTANCE_INDEX);
 
-		Assertions.assertThat(variableCreated).hasProcessInstanceId(event.getEntity().getProcessInstanceId())
-				.hasName(event.getEntity().getName()).hasTaskId(event.getEntity().getTaskId())
-				.hasType(event.getEntity().getType()).hasTask(null).hasProcessInstance(null);
-	}
+        Assertions.assertThat(variableCreated).hasProcessInstanceId(event.getEntity().getProcessInstanceId())
+                .hasName(event.getEntity().getName()).hasTaskId(event.getEntity().getTaskId())
+                .hasType(event.getEntity().getType()).hasTask(null).hasProcessInstance(null);
+    }
 
-	private void setUpMocks(VariableInstanceImpl<String> variableInstance, CloudVariableCreatedEventImpl event)
-			throws InterruptedException, ExecutionException {
-		HashMap<String, Set<Variable>> variables = new HashMap<>();
-		variables.put(variableInstance.getType(), new HashSet<>());
-		ProcessInstance processInstance = mock(ProcessInstance.class);
+    private void setUpMocks(VariableInstanceImpl<String> variableInstance, CloudVariableCreatedEventImpl event)
+            throws InterruptedException, ExecutionException {
+        HashMap<String, Set<Variable>> variables = new HashMap<>();
+        variables.put(variableInstance.getType(), new HashSet<>());
+        ProcessInstance processInstance = mock(ProcessInstance.class);
 
-		when(processInstance.getVariables()).thenReturn(variables);
-		when(processInstanceRepository.findById(event.getEntity().getProcessInstanceId()))
-				.thenReturn(Optional.of(processInstance));
+        when(processInstance.getVariables()).thenReturn(variables);
+        when(processInstanceRepository.findById(event.getEntity().getProcessInstanceId()))
+                .thenReturn(Optional.of(processInstance));
 
-		when(esIndexesConfiguration.getProcessInstanceDocumentType()).thenReturn(DOC_TYPE);
-		when(esIndexesConfiguration.getTaskDocumentType()).thenReturn(DOC_TYPE);
-		when(esIndexesConfiguration.getProcessInstanceIndex()).thenReturn(PROCESS_INSTANCE_INDEX);
-		when(esIndexesConfiguration.getTaskIndex()).thenReturn(TASK_INDEX);
-	}
+        when(esIndexesConfiguration.getProcessInstanceDocumentType()).thenReturn(DOC_TYPE);
+        when(esIndexesConfiguration.getTaskDocumentType()).thenReturn(DOC_TYPE);
+        when(esIndexesConfiguration.getProcessInstanceIndex()).thenReturn(PROCESS_INSTANCE_INDEX);
+        when(esIndexesConfiguration.getTaskIndex()).thenReturn(TASK_INDEX);
+    }
 
-	@SuppressWarnings("unchecked")
-	private void setUpUpdateExecution() throws InterruptedException, ExecutionException {
-		ActionFuture<UpdateResponse> actionFuture = mock(ActionFuture.class);
-		UpdateResponse updateResponse = mock(UpdateResponse.class);
+    @SuppressWarnings("unchecked")
+    private void setUpUpdateExecution() throws InterruptedException, ExecutionException {
+        ActionFuture<UpdateResponse> actionFuture = mock(ActionFuture.class);
+        UpdateResponse updateResponse = mock(UpdateResponse.class);
 
-		when(actionFuture.get()).thenReturn(updateResponse);
-		when(esClient.update(ArgumentMatchers.any(UpdateRequest.class))).thenReturn(actionFuture);
-	}
+        when(actionFuture.get()).thenReturn(updateResponse);
+        when(esClient.update(ArgumentMatchers.any(UpdateRequest.class))).thenReturn(actionFuture);
+    }
 
-	@Test
-	public void handleShouldCreateAndStoreTaskVariable() throws InterruptedException, ExecutionException {
-		// given
-		VariableInstanceImpl<String> variableInstance = buildVariable();
-		variableInstance.setTaskId(UUID.randomUUID().toString());
-		CloudVariableCreatedEventImpl event = new CloudVariableCreatedEventImpl(variableInstance);
+    @Test
+    public void handleShouldCreateAndStoreTaskVariable() throws InterruptedException, ExecutionException {
+        // given
+        VariableInstanceImpl<String> variableInstance = buildVariable();
+        variableInstance.setTaskId(UUID.randomUUID().toString());
+        CloudVariableCreatedEventImpl event = new CloudVariableCreatedEventImpl(variableInstance);
 
-		setUpMocks(variableInstance, event);
+        setUpMocks(variableInstance, event);
 
-		Task task = mock(Task.class);
-		when(taskRepository.findById(event.getEntity().getTaskId())).thenReturn(Optional.of(task));
+        Task task = mock(Task.class);
+        when(taskRepository.findById(event.getEntity().getTaskId())).thenReturn(Optional.of(task));
 
-		setUpUpdateExecution();
+        setUpUpdateExecution();
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		Variable variableCreated = verifyUpdateAndGetVariableCreated(variableInstance, TASK_INDEX);
+        // then
+        Variable variableCreated = verifyUpdateAndGetVariableCreated(variableInstance, TASK_INDEX);
 
-		Assertions.assertThat(variableCreated).hasProcessInstanceId(event.getEntity().getProcessInstanceId())
-				.hasName(event.getEntity().getName()).hasTaskId(event.getEntity().getTaskId())
-				.hasType(event.getEntity().getType()).hasTask(null).hasProcessInstance(null);
-	}
+        Assertions.assertThat(variableCreated).hasProcessInstanceId(event.getEntity().getProcessInstanceId())
+                .hasName(event.getEntity().getName()).hasTaskId(event.getEntity().getTaskId())
+                .hasType(event.getEntity().getType()).hasTask(null).hasProcessInstance(null);
+    }
 
-	private Variable verifyUpdateAndGetVariableCreated(VariableInstanceImpl<String> variableInstance,
-			String indexName) {
-		ArgumentCaptor<UpdateRequest> captor = ArgumentCaptor.forClass(UpdateRequest.class);
-		verify(esClient).update(captor.capture());
-		UpdateRequest updateRequest = captor.getValue();
+    private Variable verifyUpdateAndGetVariableCreated(VariableInstanceImpl<String> variableInstance,
+            String indexName) {
+        ArgumentCaptor<UpdateRequest> captor = ArgumentCaptor.forClass(UpdateRequest.class);
+        verify(esClient).update(captor.capture());
+        UpdateRequest updateRequest = captor.getValue();
 
-		assertEquals(indexName, updateRequest.index());
+        assertEquals(indexName, updateRequest.index());
 
-		Map<String, Object> docSourceAsMap = updateRequest.doc().sourceAsMap();
-		if (variableInstance.isTaskVariable()) {
-			Task task = objectMapper.convertValue(docSourceAsMap, Task.class);
-			return task.getVariables().get(variableInstance.getType()).iterator().next();
-		}
+        Map<String, Object> docSourceAsMap = updateRequest.doc().sourceAsMap();
+        if (variableInstance.isTaskVariable()) {
+            Task task = objectMapper.convertValue(docSourceAsMap, Task.class);
+            return task.getVariables().get(variableInstance.getType()).iterator().next();
+        }
 
-		ProcessInstance processInstanceUpdated = objectMapper.convertValue(docSourceAsMap, ProcessInstance.class);
-		return processInstanceUpdated.getVariables().get(variableInstance.getType()).iterator().next();
-	}
+        ProcessInstance processInstanceUpdated = objectMapper.convertValue(docSourceAsMap, ProcessInstance.class);
+        return processInstanceUpdated.getVariables().get(variableInstance.getType()).iterator().next();
+    }
 
-	private VariableInstanceImpl<String> buildVariable() {
-		return new VariableInstanceImpl<>("var", "string", "v1", UUID.randomUUID().toString());
-	}
+    private VariableInstanceImpl<String> buildVariable() {
+        return new VariableInstanceImpl<>("var", "string", "v1", UUID.randomUUID().toString());
+    }
 
-	@Test
-	public void getHandledEventShouldReturnVariableCreatedEvent() {
-		// when
-		String handledEvent = handler.getHandledEvent();
+    @Test
+    public void getHandledEventShouldReturnVariableCreatedEvent() {
+        // when
+        String handledEvent = handler.getHandledEvent();
 
-		// then
-		assertThat(handledEvent).isEqualTo(VariableEvent.VariableEvents.VARIABLE_CREATED.name());
-	}
+        // then
+        assertThat(handledEvent).isEqualTo(VariableEvent.VariableEvents.VARIABLE_CREATED.name());
+    }
 }

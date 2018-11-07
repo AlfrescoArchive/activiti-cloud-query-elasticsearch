@@ -25,17 +25,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessVariableDeletedEventHandler {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessVariableDeletedEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessVariableDeletedEventHandler.class);
 
-	private VariableUpdater variableUpdater;
+    private VariableUpdater variableUpdater;
 
-	@Autowired
-	public ProcessVariableDeletedEventHandler(VariableUpdater variableUpdater) {
-		this.variableUpdater = variableUpdater;
-	}
+    @Autowired
+    public ProcessVariableDeletedEventHandler(VariableUpdater variableUpdater) {
+        this.variableUpdater = variableUpdater;
+    }
 
-	public void handle(CloudVariableDeletedEvent event) {
-		LOGGER.debug("Handling process variable deleted event: " + event.getEntity().getName());
-		variableUpdater.markVariableAsDeleted(event.getEntity());
-	}
+    public void handle(CloudVariableDeletedEvent event) {
+        LOGGER.debug("Handling process variable deleted event: " + event.getEntity().getName());
+        variableUpdater.markVariableAsDeleted(event.getEntity());
+    }
 }

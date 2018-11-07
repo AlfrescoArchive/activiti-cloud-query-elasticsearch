@@ -28,30 +28,30 @@ import static org.mockito.ArgumentMatchers.eq;
 
 public class ProcessVariableUpdateEventHandlerTest {
 
-	@InjectMocks
-	private ProcessVariableUpdateEventHandler handler;
+    @InjectMocks
+    private ProcessVariableUpdateEventHandler handler;
 
-	@Mock
-	private VariableUpdater variableUpdater;
+    @Mock
+    private VariableUpdater variableUpdater;
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-	@Test
-	public void handleShouldUpdateVariable() {
-		// given
-		Variable variableEntity = new Variable();
-		variableEntity.setName("var");
-		variableEntity.setValue("v1");
-		variableEntity.setProcessInstanceId("10");
+    @Test
+    public void handleShouldUpdateVariable() {
+        // given
+        Variable variableEntity = new Variable();
+        variableEntity.setName("var");
+        variableEntity.setValue("v1");
+        variableEntity.setProcessInstanceId("10");
 
-		// when
-		handler.handle(variableEntity);
+        // when
+        handler.handle(variableEntity);
 
-		// then
-		verify(variableUpdater).updateVariable(eq(variableEntity));
-	}
+        // then
+        verify(variableUpdater).updateVariable(eq(variableEntity));
+    }
 
 }

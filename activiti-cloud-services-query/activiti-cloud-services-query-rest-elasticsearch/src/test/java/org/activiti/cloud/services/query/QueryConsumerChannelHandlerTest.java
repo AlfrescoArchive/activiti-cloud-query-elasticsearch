@@ -43,14 +43,14 @@ public class QueryConsumerChannelHandlerTest {
 
     @Test
     public void receiveShouldHandleReceivedEvent() {
-        //given
+        // given
         CloudProcessCreatedEventImpl processCreatedEvent = new CloudProcessCreatedEventImpl();
         CloudProcessStartedEventImpl processStartedEvent = new CloudProcessStartedEventImpl();
 
-        //when
+        // when
         consumer.receive(processCreatedEvent, processStartedEvent);
 
-        //then
+        // then
         verify(eventHandlerContext).handle(processCreatedEvent, processStartedEvent);
     }
 

@@ -25,14 +25,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentFinder {
 
-	public <T, ID extends Serializable> T findById(ElasticsearchRepository<T, ID> repository, ID id,
-			String notFoundMessage) {
-		Optional<T> findResult = repository.findById(id);
-		return getEntity(findResult, notFoundMessage);
-	}
+    public <T, ID extends Serializable> T findById(ElasticsearchRepository<T, ID> repository, ID id,
+            String notFoundMessage) {
+        Optional<T> findResult = repository.findById(id);
+        return getEntity(findResult, notFoundMessage);
+    }
 
-	private <T> T getEntity(Optional<T> result, String notFoundMessage) {
-		return result.orElseThrow(() -> new IllegalStateException(notFoundMessage));
-	}
+    private <T> T getEntity(Optional<T> result, String notFoundMessage) {
+        return result.orElseThrow(() -> new IllegalStateException(notFoundMessage));
+    }
 
 }

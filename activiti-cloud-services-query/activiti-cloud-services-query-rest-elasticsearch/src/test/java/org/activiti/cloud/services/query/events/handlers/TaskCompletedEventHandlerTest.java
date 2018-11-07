@@ -58,49 +58,48 @@ public class TaskCompletedEventHandlerTest {
 
     @Test
     public void handleShouldUpdateTaskStatusToCompleted() {
-        //given
+        // given
         CloudTaskCompletedEventImpl event = buildTaskCompletedEvent();
         String taskId = event.getEntity().getId();
         Task eventTaskEntity = aTask().withId(taskId).build();
 
         given(taskRepository.findById(taskId)).willReturn(Optional.of(eventTaskEntity));
 
-        //when
+        // when
         handler.handle(event);
 
-        //then
+        // then
         verify(taskRepository).save(eventTaskEntity);
         verify(eventTaskEntity).setStatus(Task.TaskStatus.COMPLETED);
         verify(eventTaskEntity).setLastModified(any(Date.class));
     }
 
     private CloudTaskCompletedEventImpl buildTaskCompletedEvent() {
-        return new CloudTaskCompletedEventImpl(new TaskImpl(UUID.randomUUID().toString(),
-                                                            "my task",
-                                                            Task.TaskStatus.COMPLETED));
+        return new CloudTaskCompletedEventImpl(
+                new TaskImpl(UUID.randomUUID().toString(), "my task", Task.TaskStatus.COMPLETED));
     }
 
     @Test
     public void handleShouldThrowAnExceptionWhenNoTaskIsFoundForTheGivenId() {
-        //given
+        // given
         CloudTaskCompletedEventImpl event = buildTaskCompletedEvent();
         String taskId = event.getEntity().getId();
         given(taskRepository.findById(taskId)).willReturn(Optional.empty());
 
-        //then
+        // then
         expectedException.expect(QueryException.class);
         expectedException.expectMessage("Unable to find task with id: " + taskId);
 
-        //when
+        // when
         handler.handle(event);
     }
 
     @Test
     public void getHandledEventShouldReturnTaskCompletedEvent() {
-        //when
+        // when
         String handledEvent = handler.getHandledEvent();
 
-        //then
+        // then
         assertThat(handledEvent).isEqualTo(TaskRuntimeEvent.TaskEvents.TASK_COMPLETED.name());
     }
 }

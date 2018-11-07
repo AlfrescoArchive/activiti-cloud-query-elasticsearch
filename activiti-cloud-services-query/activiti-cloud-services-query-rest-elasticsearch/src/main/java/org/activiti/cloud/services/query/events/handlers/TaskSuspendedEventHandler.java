@@ -31,9 +31,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class TaskSuspendedEventHandler implements QueryEventHandler {
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(TaskSuspendedEventHandler.class);
-	
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskSuspendedEventHandler.class);
+
     private final TaskRepository taskRepository;
 
     @Autowired
@@ -44,8 +44,8 @@ public class TaskSuspendedEventHandler implements QueryEventHandler {
     @Override
     public void handle(CloudRuntimeEvent<?, ?> event) {
         CloudTaskSuspendedEvent taskSuspendedEvent = (CloudTaskSuspendedEvent) event;
-		org.activiti.api.task.model.Task eventTask = taskSuspendedEvent.getEntity();
-		LOGGER.debug("Handling suspended task Instance " + eventTask.getId());
+        org.activiti.api.task.model.Task eventTask = taskSuspendedEvent.getEntity();
+        LOGGER.debug("Handling suspended task Instance " + eventTask.getId());
 
         Task task = taskRepository.findById(taskSuspendedEvent.getEntity().getId())
                 .orElseThrow(() -> new QueryException("Unable to find task with id: " + eventTask.getId()));

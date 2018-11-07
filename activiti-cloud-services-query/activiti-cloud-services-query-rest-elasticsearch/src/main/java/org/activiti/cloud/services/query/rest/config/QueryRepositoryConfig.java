@@ -30,15 +30,15 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapt
 @ComponentScan(basePackages = { "org.activiti.cloud.services.query.model.elastic" })
 public class QueryRepositoryConfig extends RepositoryRestConfigurerAdapter {
 
-	@Override
-	public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
+    @Override
+    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
 
-		// Expose only repositories annotated with @RepositoryRestResource
-		config.setRepositoryDetectionStrategy(RepositoryDetectionStrategies.ANNOTATED);
+        // Expose only repositories annotated with @RepositoryRestResource
+        config.setRepositoryDetectionStrategy(RepositoryDetectionStrategies.ANNOTATED);
 
-		// by default the ids are not exposed the the REST API
-		config.exposeIdsFor(ProcessInstance.class);
-		config.exposeIdsFor(Task.class);
-	}
+        // by default the ids are not exposed the the REST API
+        config.exposeIdsFor(ProcessInstance.class);
+        config.exposeIdsFor(Task.class);
+    }
 
 }

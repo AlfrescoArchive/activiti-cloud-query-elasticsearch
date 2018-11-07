@@ -54,21 +54,17 @@ public class TaskCreatedEventHandlerTest {
 
     @Test
     public void handleShouldStoreNewTaskInstance() {
-        //given
-        TaskImpl task = new TaskImpl(UUID.randomUUID().toString(),
-                                     "task",
-                                     Task.TaskStatus.CREATED);
+        // given
+        TaskImpl task = new TaskImpl(UUID.randomUUID().toString(), "task", Task.TaskStatus.CREATED);
         task.setCreatedDate(new Date());
         task.setProcessInstanceId(UUID.randomUUID().toString());
-        CloudTaskCreatedEventImpl event = new CloudTaskCreatedEventImpl(
-                task
-        );
+        CloudTaskCreatedEventImpl event = new CloudTaskCreatedEventImpl(task);
         event.setServiceName("runtime-bundle-a");
 
-        //when
+        // when
         handler.handle(event);
 
-        //then
+        // then
         ArgumentCaptor<Task> captor = ArgumentCaptor.forClass(Task.class);
         verify(taskRepository).save(captor.capture());
         assertThat(captor.getValue().getStatus()).isEqualTo(Task.TaskStatus.CREATED);
@@ -79,10 +75,10 @@ public class TaskCreatedEventHandlerTest {
 
     @Test
     public void getHandledEventShouldReturnTaskCreatedEvent() {
-        //when
+        // when
         String handledEvent = handler.getHandledEvent();
 
-        //then
+        // then
         assertThat(handledEvent).isEqualTo(TaskRuntimeEvent.TaskEvents.TASK_CREATED.name());
     }
 }

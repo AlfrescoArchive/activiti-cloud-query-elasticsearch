@@ -22,9 +22,7 @@ import org.springframework.hateoas.Resource;
 
 public class VariableResource extends Resource<VariableInstance> {
 
-    public VariableResource(VariableInstance content,
-                            Link... links) {
-        super(content,
-              links);
+    public VariableResource(VariableInstance content, Link... links) {
+        super(content, links);
     }
 }

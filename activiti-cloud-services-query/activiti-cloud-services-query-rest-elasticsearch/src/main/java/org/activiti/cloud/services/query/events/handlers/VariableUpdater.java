@@ -44,148 +44,148 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @Component
 public class VariableUpdater {
 
-	private static final String VARIABLES_FIELD = "variables";
-	
-	private ProcessInstanceRepository processInstanceRepository;
-	private TaskRepository taskRepository;
-	private ObjectMapper objectMapper;
-	private ESIndexesConfiguration esIndexesConfiguration;
-	private Client esClient;
-	private DocumentFinder documentFinder;
+    private static final String VARIABLES_FIELD = "variables";
 
-	@Autowired
-	public VariableUpdater(ProcessInstanceRepository processInstanceRepository, TaskRepository taskRepository,
-			ObjectMapper objectMapper, ESIndexesConfiguration esIndexesConfiguration, Client esClient,
-			DocumentFinder documentFinder) {
-		this.processInstanceRepository = processInstanceRepository;
-		this.taskRepository = taskRepository;
-		this.objectMapper = objectMapper;
-		this.esIndexesConfiguration = esIndexesConfiguration;
-		this.esClient = esClient;
-		this.documentFinder = documentFinder;
-	}
+    private ProcessInstanceRepository processInstanceRepository;
+    private TaskRepository taskRepository;
+    private ObjectMapper objectMapper;
+    private ESIndexesConfiguration esIndexesConfiguration;
+    private Client esClient;
+    private DocumentFinder documentFinder;
 
-	public void updateVariable(Variable updatedVariableEntity) {
-		String variableName = updatedVariableEntity.getName();
-		String processInstanceId = updatedVariableEntity.getProcessInstanceId();
-		String taskId = updatedVariableEntity.getTaskId();
-		String variableType = updatedVariableEntity.getType();
-		boolean isTaskVariable = updatedVariableEntity.isTaskVariable();
+    @Autowired
+    public VariableUpdater(ProcessInstanceRepository processInstanceRepository, TaskRepository taskRepository,
+            ObjectMapper objectMapper, ESIndexesConfiguration esIndexesConfiguration, Client esClient,
+            DocumentFinder documentFinder) {
+        this.processInstanceRepository = processInstanceRepository;
+        this.taskRepository = taskRepository;
+        this.objectMapper = objectMapper;
+        this.esIndexesConfiguration = esIndexesConfiguration;
+        this.esClient = esClient;
+        this.documentFinder = documentFinder;
+    }
 
-		String partialExceptionMessage = isTaskVariable ? " from task with the given id: " + taskId
-				: " from process instance with the given id: " + processInstanceId;
+    public void updateVariable(Variable updatedVariableEntity) {
+        String variableName = updatedVariableEntity.getName();
+        String processInstanceId = updatedVariableEntity.getProcessInstanceId();
+        String taskId = updatedVariableEntity.getTaskId();
+        String variableType = updatedVariableEntity.getType();
+        boolean isTaskVariable = updatedVariableEntity.isTaskVariable();
 
-		Map<String, Set<Variable>> variables = findVariablesFromParent(updatedVariableEntity);
+        String partialExceptionMessage = isTaskVariable ? " from task with the given id: " + taskId
+                : " from process instance with the given id: " + processInstanceId;
 
-		Set<Variable> variablesByType = variables.get(updatedVariableEntity.getType());
-		if (CollectionUtils.isEmpty(variablesByType)) {
-			throw new QueryException("Unable to find variables for type: " + variableType + partialExceptionMessage);
-		}
+        Map<String, Set<Variable>> variables = findVariablesFromParent(updatedVariableEntity);
 
-		if (!variablesByType.contains(updatedVariableEntity)) {
-			throw new QueryException("Unable to find variable with name: " + variableName + partialExceptionMessage);
-		}
+        Set<Variable> variablesByType = variables.get(updatedVariableEntity.getType());
+        if (CollectionUtils.isEmpty(variablesByType)) {
+            throw new QueryException("Unable to find variables for type: " + variableType + partialExceptionMessage);
+        }
 
-		for (Variable var : variablesByType) {
-			if (var.equals(updatedVariableEntity)) {
-				var.setLastUpdatedTime(updatedVariableEntity.getLastUpdatedTime());
-				var.setValue(updatedVariableEntity.getValue());
-				break;
-			}
-		}
+        if (!variablesByType.contains(updatedVariableEntity)) {
+            throw new QueryException("Unable to find variable with name: " + variableName + partialExceptionMessage);
+        }
 
-		UpdateRequest updateRequest = getUpdateRequest(updatedVariableEntity);
-		try {
-			updateVariables(updateRequest, variables);
-		} catch (Exception e) {
-			throw new QueryException("Unable to update variable with name: " + variableName + partialExceptionMessage,
-					e);
-		}
-	}
+        for (Variable var : variablesByType) {
+            if (var.equals(updatedVariableEntity)) {
+                var.setLastUpdatedTime(updatedVariableEntity.getLastUpdatedTime());
+                var.setValue(updatedVariableEntity.getValue());
+                break;
+            }
+        }
 
-	private Map<String, Set<Variable>> findVariablesFromParent(VariableInstance variableInstance) {
-		Map<String, Set<Variable>> variables;
-		if (variableInstance.isTaskVariable()) {
-			Task task = documentFinder.findById(taskRepository, variableInstance.getTaskId(),
-					"Unable to find task with the given id: " + variableInstance.getTaskId());
-			variables = task.getVariables();
-		} else {
-			ProcessInstance processInstance = documentFinder.findById(processInstanceRepository,
-					variableInstance.getProcessInstanceId(),
-					"Unable to find process instance with the given id: " + variableInstance.getProcessInstanceId());
-			variables = processInstance.getVariables();
-		}
+        UpdateRequest updateRequest = getUpdateRequest(updatedVariableEntity);
+        try {
+            updateVariables(updateRequest, variables);
+        } catch (Exception e) {
+            throw new QueryException("Unable to update variable with name: " + variableName + partialExceptionMessage,
+                    e);
+        }
+    }
 
-		return variables == null ? new HashMap<>() : variables;
-	}
+    private Map<String, Set<Variable>> findVariablesFromParent(VariableInstance variableInstance) {
+        Map<String, Set<Variable>> variables;
+        if (variableInstance.isTaskVariable()) {
+            Task task = documentFinder.findById(taskRepository, variableInstance.getTaskId(),
+                    "Unable to find task with the given id: " + variableInstance.getTaskId());
+            variables = task.getVariables();
+        } else {
+            ProcessInstance processInstance = documentFinder.findById(processInstanceRepository,
+                    variableInstance.getProcessInstanceId(),
+                    "Unable to find process instance with the given id: " + variableInstance.getProcessInstanceId());
+            variables = processInstance.getVariables();
+        }
 
-	private void updateVariables(UpdateRequest updateRequest, Map<String, Set<Variable>> variables)
-			throws InterruptedException, ExecutionException, JsonProcessingException {
-		ObjectNode objectNode = objectMapper.createObjectNode();
-		objectNode.set(VARIABLES_FIELD, objectMapper.valueToTree(variables));
+        return variables == null ? new HashMap<>() : variables;
+    }
 
-		updateRequest.doc(objectMapper.writeValueAsString(objectNode), XContentType.JSON);
-		esClient.update(updateRequest).get();
-	}
+    private void updateVariables(UpdateRequest updateRequest, Map<String, Set<Variable>> variables)
+            throws InterruptedException, ExecutionException, JsonProcessingException {
+        ObjectNode objectNode = objectMapper.createObjectNode();
+        objectNode.set(VARIABLES_FIELD, objectMapper.valueToTree(variables));
 
-	private UpdateRequest getUpdateRequest(VariableInstance variableInstance) {
-		UpdateRequest updateRequest = new UpdateRequest();
-		if (!variableInstance.isTaskVariable()) {
-			updateRequest.index(esIndexesConfiguration.getProcessInstanceIndex());
-			updateRequest.type(esIndexesConfiguration.getProcessInstanceDocumentType());
-			updateRequest.id(variableInstance.getProcessInstanceId());
-			return updateRequest;
-		}
+        updateRequest.doc(objectMapper.writeValueAsString(objectNode), XContentType.JSON);
+        esClient.update(updateRequest).get();
+    }
 
-		updateRequest.index(esIndexesConfiguration.getTaskIndex());
-		updateRequest.type(esIndexesConfiguration.getTaskDocumentType());
-		updateRequest.id(variableInstance.getTaskId());
-		return updateRequest;
-	}
+    private UpdateRequest getUpdateRequest(VariableInstance variableInstance) {
+        UpdateRequest updateRequest = new UpdateRequest();
+        if (!variableInstance.isTaskVariable()) {
+            updateRequest.index(esIndexesConfiguration.getProcessInstanceIndex());
+            updateRequest.type(esIndexesConfiguration.getProcessInstanceDocumentType());
+            updateRequest.id(variableInstance.getProcessInstanceId());
+            return updateRequest;
+        }
 
-	public void markVariableAsDeleted(VariableInstance variableInstance) {
-		String taskId = variableInstance.getTaskId();
-		String processInstanceId = variableInstance.getProcessInstanceId();
-		String variableName = variableInstance.getName();
-		boolean isTaskVariable = variableInstance.isTaskVariable();
+        updateRequest.index(esIndexesConfiguration.getTaskIndex());
+        updateRequest.type(esIndexesConfiguration.getTaskDocumentType());
+        updateRequest.id(variableInstance.getTaskId());
+        return updateRequest;
+    }
 
-		Map<String, Set<Variable>> variables = findVariablesFromParent(variableInstance);
-		Set<Variable> variablesByType = variables.get(variableInstance.getType());
-		if (CollectionUtils.isEmpty(variablesByType)) {
-			String emptyVariablesByTypeExceptionMessage = isTaskVariable
-					? "Task with the given id: '" + taskId + "' has no variables"
-					: "ProcessInstance with the given id: '" + processInstanceId + "' has no variables";
-			throw new QueryException(emptyVariablesByTypeExceptionMessage);
-		}
+    public void markVariableAsDeleted(VariableInstance variableInstance) {
+        String taskId = variableInstance.getTaskId();
+        String processInstanceId = variableInstance.getProcessInstanceId();
+        String variableName = variableInstance.getName();
+        boolean isTaskVariable = variableInstance.isTaskVariable();
 
-		boolean variableFound = false;
-		for (Variable variable : variablesByType) {
-			if (variableName.equals(variable.getName())) {
-				variable.setMarkedAsDeleted(true);
-				variableFound = true;
-				break;
-			}
-		}
+        Map<String, Set<Variable>> variables = findVariablesFromParent(variableInstance);
+        Set<Variable> variablesByType = variables.get(variableInstance.getType());
+        if (CollectionUtils.isEmpty(variablesByType)) {
+            String emptyVariablesByTypeExceptionMessage = isTaskVariable
+                    ? "Task with the given id: '" + taskId + "' has no variables"
+                    : "ProcessInstance with the given id: '" + processInstanceId + "' has no variables";
+            throw new QueryException(emptyVariablesByTypeExceptionMessage);
+        }
 
-		if (!variableFound) {
-			String variableNotFoundExceptionMessage = isTaskVariable
-					? "Unable to find variable with  name '" + variableName + "' from task '" + taskId + "'"
-					: "Unable to find variable with  name '" + variableName + "' from process instance '"
-							+ processInstanceId + "'";
-			throw new QueryException(variableNotFoundExceptionMessage);
-		}
+        boolean variableFound = false;
+        for (Variable variable : variablesByType) {
+            if (variableName.equals(variable.getName())) {
+                variable.setMarkedAsDeleted(true);
+                variableFound = true;
+                break;
+            }
+        }
 
-		UpdateRequest updateRequest = getUpdateRequest(variableInstance);
-		try {
-			updateVariables(updateRequest, variables);
-		} catch (Exception e) {
-			String updateErrorExceptionMessage = isTaskVariable
-					? "Unable to mark as deleted variable with name: " + variableName + " from task with the given id: "
-							+ taskId
-					: "Unable to mark as deleted variable with name: " + variableName
-							+ " from process instance with the given id: " + processInstanceId;
-			throw new QueryException(updateErrorExceptionMessage, e);
-		}
-	}
+        if (!variableFound) {
+            String variableNotFoundExceptionMessage = isTaskVariable
+                    ? "Unable to find variable with  name '" + variableName + "' from task '" + taskId + "'"
+                    : "Unable to find variable with  name '" + variableName + "' from process instance '"
+                            + processInstanceId + "'";
+            throw new QueryException(variableNotFoundExceptionMessage);
+        }
+
+        UpdateRequest updateRequest = getUpdateRequest(variableInstance);
+        try {
+            updateVariables(updateRequest, variables);
+        } catch (Exception e) {
+            String updateErrorExceptionMessage = isTaskVariable
+                    ? "Unable to mark as deleted variable with name: " + variableName + " from task with the given id: "
+                            + taskId
+                    : "Unable to mark as deleted variable with name: " + variableName
+                            + " from process instance with the given id: " + processInstanceId;
+            throw new QueryException(updateErrorExceptionMessage, e);
+        }
+    }
 
 }

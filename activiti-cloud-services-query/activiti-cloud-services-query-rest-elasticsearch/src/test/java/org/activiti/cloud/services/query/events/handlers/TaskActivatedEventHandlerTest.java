@@ -42,86 +42,86 @@ import org.mockito.Mock;
 
 public class TaskActivatedEventHandlerTest {
 
-	@InjectMocks
-	private TaskActivatedEventHandler handler;
+    @InjectMocks
+    private TaskActivatedEventHandler handler;
 
-	@Mock
-	private TaskRepository taskRepository;
+    @Mock
+    private TaskRepository taskRepository;
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-	@Test
-	public void handleShouldUpdateTaskStatusToCreatedWhenNoAssignee() {
-		// given
-		CloudTaskActivatedEventImpl event = buildActivatedEvent();
+    @Test
+    public void handleShouldUpdateTaskStatusToCreatedWhenNoAssignee() {
+        // given
+        CloudTaskActivatedEventImpl event = buildActivatedEvent();
 
-		String taskId = event.getEntity().getId();
-		Task taskEntity = aTask().withId(taskId).build();
+        String taskId = event.getEntity().getId();
+        Task taskEntity = aTask().withId(taskId).build();
 
-		given(taskRepository.findById(taskId)).willReturn(Optional.of(taskEntity));
+        given(taskRepository.findById(taskId)).willReturn(Optional.of(taskEntity));
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		verify(taskRepository).save(taskEntity);
-		verify(taskEntity).setStatus(Task.TaskStatus.CREATED);
-		verify(taskEntity).setLastModified(any(Date.class));
-	}
+        // then
+        verify(taskRepository).save(taskEntity);
+        verify(taskEntity).setStatus(Task.TaskStatus.CREATED);
+        verify(taskEntity).setLastModified(any(Date.class));
+    }
 
-	@Test
-	public void handleShouldUpdateTaskStatusToAssignedWhenHasAssignee() {
-		// given
-		CloudTaskActivatedEventImpl event = buildActivatedEvent();
+    @Test
+    public void handleShouldUpdateTaskStatusToAssignedWhenHasAssignee() {
+        // given
+        CloudTaskActivatedEventImpl event = buildActivatedEvent();
 
-		String taskId = event.getEntity().getId();
-		Task taskEntity = aTask().withAssignee("user").withId(taskId).build();
+        String taskId = event.getEntity().getId();
+        Task taskEntity = aTask().withAssignee("user").withId(taskId).build();
 
-		given(taskRepository.findById(taskId)).willReturn(Optional.of(taskEntity));
+        given(taskRepository.findById(taskId)).willReturn(Optional.of(taskEntity));
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		verify(taskRepository).save(taskEntity);
-		verify(taskEntity).setStatus(Task.TaskStatus.ASSIGNED);
-		verify(taskEntity).setLastModified(any(Date.class));
-	}
+        // then
+        verify(taskRepository).save(taskEntity);
+        verify(taskEntity).setStatus(Task.TaskStatus.ASSIGNED);
+        verify(taskEntity).setLastModified(any(Date.class));
+    }
 
-	private CloudTaskActivatedEventImpl buildActivatedEvent() {
-		return new CloudTaskActivatedEventImpl(
-				new TaskImpl(UUID.randomUUID().toString(), "my task", Task.TaskStatus.SUSPENDED));
-	}
+    private CloudTaskActivatedEventImpl buildActivatedEvent() {
+        return new CloudTaskActivatedEventImpl(
+                new TaskImpl(UUID.randomUUID().toString(), "my task", Task.TaskStatus.SUSPENDED));
+    }
 
-	@Test
-	public void handleShouldThrowExceptionWhenNoTaskIsFoundForTheGivenId() {
-		// given
-		CloudTaskActivatedEventImpl event = buildActivatedEvent();
+    @Test
+    public void handleShouldThrowExceptionWhenNoTaskIsFoundForTheGivenId() {
+        // given
+        CloudTaskActivatedEventImpl event = buildActivatedEvent();
 
-		String taskId = event.getEntity().getId();
+        String taskId = event.getEntity().getId();
 
-		given(taskRepository.findById(taskId)).willReturn(Optional.empty());
+        given(taskRepository.findById(taskId)).willReturn(Optional.empty());
 
-		// then
-		expectedException.expect(QueryException.class);
-		expectedException.expectMessage("Unable to find taskEntity with id: " + taskId);
+        // then
+        expectedException.expect(QueryException.class);
+        expectedException.expectMessage("Unable to find taskEntity with id: " + taskId);
 
-		// when
-		handler.handle(event);
-	}
+        // when
+        handler.handle(event);
+    }
 
-	@Test
-	public void getHandledEventShouldReturnTaskActivatedEvent() {
-		// when
-		String handledEvent = handler.getHandledEvent();
+    @Test
+    public void getHandledEventShouldReturnTaskActivatedEvent() {
+        // when
+        String handledEvent = handler.getHandledEvent();
 
-		// then
-		assertThat(handledEvent).isEqualTo(TaskRuntimeEvent.TaskEvents.TASK_ACTIVATED.name());
-	}
+        // then
+        assertThat(handledEvent).isEqualTo(TaskRuntimeEvent.TaskEvents.TASK_ACTIVATED.name());
+    }
 }

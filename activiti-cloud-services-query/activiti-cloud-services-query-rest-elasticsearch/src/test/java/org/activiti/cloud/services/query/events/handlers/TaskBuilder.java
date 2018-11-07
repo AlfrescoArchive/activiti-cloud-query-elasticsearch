@@ -23,27 +23,27 @@ import org.activiti.cloud.services.query.model.elastic.Task;
 
 public class TaskBuilder {
 
-	private Task taskEntity;
+    private Task taskEntity;
 
-	private TaskBuilder() {
-		this.taskEntity = mock(Task.class);
-	}
+    private TaskBuilder() {
+        this.taskEntity = mock(Task.class);
+    }
 
-	public static TaskBuilder aTask() {
-		return new TaskBuilder();
-	}
+    public static TaskBuilder aTask() {
+        return new TaskBuilder();
+    }
 
-	public TaskBuilder withId(String taskId) {
-		when(taskEntity.getId()).thenReturn(taskId);
-		return this;
-	}
+    public TaskBuilder withId(String taskId) {
+        when(taskEntity.getId()).thenReturn(taskId);
+        return this;
+    }
 
-	public TaskBuilder withAssignee(String assignee) {
-		when(taskEntity.getAssignee()).thenReturn(assignee);
-		return this;
-	}
+    public TaskBuilder withAssignee(String assignee) {
+        when(taskEntity.getAssignee()).thenReturn(assignee);
+        return this;
+    }
 
-	public Task build() {
-		return taskEntity;
-	}
+    public Task build() {
+        return taskEntity;
+    }
 }

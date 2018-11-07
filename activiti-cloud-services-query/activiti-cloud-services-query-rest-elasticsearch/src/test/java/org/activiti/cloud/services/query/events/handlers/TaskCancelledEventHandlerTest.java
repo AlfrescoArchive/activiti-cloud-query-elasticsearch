@@ -46,63 +46,63 @@ import org.mockito.Mock;
  */
 public class TaskCancelledEventHandlerTest {
 
-	@InjectMocks
-	private TaskCancelledEventHandler handler;
+    @InjectMocks
+    private TaskCancelledEventHandler handler;
 
-	@Mock
-	private TaskRepository taskRepository;
+    @Mock
+    private TaskRepository taskRepository;
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-	@Test
-	public void handleShouldUpdateTaskStatusToCancelled() {
-		// given
-		CloudTaskCancelledEvent event = buildTaskCancelledEvent();
-		String taskId = event.getEntity().getId();
-		Task taskEntity = aTask().withId(taskId).build();
-		given(taskRepository.findById(taskId)).willReturn(Optional.of(taskEntity));
+    @Test
+    public void handleShouldUpdateTaskStatusToCancelled() {
+        // given
+        CloudTaskCancelledEvent event = buildTaskCancelledEvent();
+        String taskId = event.getEntity().getId();
+        Task taskEntity = aTask().withId(taskId).build();
+        given(taskRepository.findById(taskId)).willReturn(Optional.of(taskEntity));
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		verify(taskRepository).save(taskEntity);
-		verify(taskEntity).setStatus(Task.TaskStatus.CANCELLED);
-		verify(taskEntity).setLastModified(any(Date.class));
-	}
+        // then
+        verify(taskRepository).save(taskEntity);
+        verify(taskEntity).setStatus(Task.TaskStatus.CANCELLED);
+        verify(taskEntity).setLastModified(any(Date.class));
+    }
 
-	private CloudTaskCancelledEvent buildTaskCancelledEvent() {
-		TaskImpl task = new TaskImpl(UUID.randomUUID().toString(), "to be cancelled", Task.TaskStatus.CANCELLED);
-		return new CloudTaskCancelledEventImpl(task);
-	}
+    private CloudTaskCancelledEvent buildTaskCancelledEvent() {
+        TaskImpl task = new TaskImpl(UUID.randomUUID().toString(), "to be cancelled", Task.TaskStatus.CANCELLED);
+        return new CloudTaskCancelledEventImpl(task);
+    }
 
-	@Test
-	public void handleShouldThrowExceptionWhenTaskNotFound() {
-		// given
-		CloudTaskCancelledEvent event = buildTaskCancelledEvent();
-		String taskId = event.getEntity().getId();
-		given(taskRepository.findById(taskId)).willReturn(Optional.empty());
+    @Test
+    public void handleShouldThrowExceptionWhenTaskNotFound() {
+        // given
+        CloudTaskCancelledEvent event = buildTaskCancelledEvent();
+        String taskId = event.getEntity().getId();
+        given(taskRepository.findById(taskId)).willReturn(Optional.empty());
 
-		// then
-		expectedException.expect(QueryException.class);
-		expectedException.expectMessage("Unable to find task with id: " + taskId);
+        // then
+        expectedException.expect(QueryException.class);
+        expectedException.expectMessage("Unable to find task with id: " + taskId);
 
-		// when
-		handler.handle(event);
-	}
+        // when
+        handler.handle(event);
+    }
 
-	@Test
-	public void getHandledEventShouldReturnTaskCancelledEvent() {
-		// when
-		String handledEvent = handler.getHandledEvent();
+    @Test
+    public void getHandledEventShouldReturnTaskCancelledEvent() {
+        // when
+        String handledEvent = handler.getHandledEvent();
 
-		// then
-		assertThat(handledEvent).isEqualTo(TaskRuntimeEvent.TaskEvents.TASK_CANCELLED.name());
-	}
+        // then
+        assertThat(handledEvent).isEqualTo(TaskRuntimeEvent.TaskEvents.TASK_CANCELLED.name());
+    }
 }

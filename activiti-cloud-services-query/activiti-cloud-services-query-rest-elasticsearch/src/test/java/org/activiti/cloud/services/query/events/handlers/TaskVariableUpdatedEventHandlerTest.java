@@ -28,32 +28,32 @@ import org.mockito.Mock;
 
 public class TaskVariableUpdatedEventHandlerTest {
 
-	@InjectMocks
-	private TaskVariableUpdatedEventHandler handler;
+    @InjectMocks
+    private TaskVariableUpdatedEventHandler handler;
 
-	@Mock
-	private VariableUpdater variableUpdater;
+    @Mock
+    private VariableUpdater variableUpdater;
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-	@Test
-	public void handleShouldUpdateVariableValue() {
-		// given
-		String taskId = "10";
-		Variable updatedVariableEntity = new Variable();
-		updatedVariableEntity.setName("var");
-		updatedVariableEntity.setType("string");
-		updatedVariableEntity.setValue("content");
-		updatedVariableEntity.setTaskId(taskId);
+    @Test
+    public void handleShouldUpdateVariableValue() {
+        // given
+        String taskId = "10";
+        Variable updatedVariableEntity = new Variable();
+        updatedVariableEntity.setName("var");
+        updatedVariableEntity.setType("string");
+        updatedVariableEntity.setValue("content");
+        updatedVariableEntity.setTaskId(taskId);
 
-		// when
-		handler.handle(updatedVariableEntity);
+        // when
+        handler.handle(updatedVariableEntity);
 
-		// then
-		verify(variableUpdater).updateVariable(eq(updatedVariableEntity));
-	}
+        // then
+        verify(variableUpdater).updateVariable(eq(updatedVariableEntity));
+    }
 
 }
