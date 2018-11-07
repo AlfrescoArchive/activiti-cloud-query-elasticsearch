@@ -22,26 +22,30 @@ import org.activiti.api.model.shared.event.VariableEvent;
 import org.activiti.cloud.api.model.shared.events.CloudRuntimeEvent;
 import org.activiti.cloud.api.model.shared.events.CloudVariableUpdatedEvent;
 import org.activiti.cloud.services.query.model.elastic.Variable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class VariableUpdatedEventHandler implements QueryEventHandler {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(VariableUpdatedEventHandler.class);
+	
     private ProcessVariableUpdateEventHandler processVariableUpdateEventHandler;
-
     private TaskVariableUpdatedEventHandler taskVariableUpdatedEventHandler;
 
     @Autowired
     public VariableUpdatedEventHandler(ProcessVariableUpdateEventHandler processVariableUpdateEventHandler,
                                        TaskVariableUpdatedEventHandler taskVariableUpdatedEventHandler) {
         this.processVariableUpdateEventHandler = processVariableUpdateEventHandler;
-        this.taskVariableUpdatedEventHandler = taskVariableUpdatedEventHandler;
+        this.taskVariableUpdatedEventHandler = taskVariableUpdatedEventHandler;        
     }
 
     @Override
     public void handle(CloudRuntimeEvent<?, ?> event) {
         CloudVariableUpdatedEvent variableUpdatedEvent = (CloudVariableUpdatedEvent) event;
+        LOGGER.debug("Handling variableEntity updated event: " + variableUpdatedEvent.getEntity().getName());
         Variable variableEntity = new Variable(null,
         		                                           variableUpdatedEvent.getEntity().getType(),
                                                            variableUpdatedEvent.getEntity().getName(),
@@ -55,8 +59,7 @@ public class VariableUpdatedEventHandler implements QueryEventHandler {
                                                            new Date(variableUpdatedEvent.getTimestamp()),
                                                            new Date(variableUpdatedEvent.getTimestamp()),
                                                            null);
-        variableEntity.setValue(variableUpdatedEvent.getEntity().getValue());
-        System.out.println("UPDATING VARIABLE " + variableEntity.getName() + " - " + variableEntity.getType() + " - " + variableEntity.getValue());
+        variableEntity.setValue(variableUpdatedEvent.getEntity().getValue());        
         if (variableUpdatedEvent.getEntity().isTaskVariable()) {
             taskVariableUpdatedEventHandler.handle(variableEntity);
         } else {

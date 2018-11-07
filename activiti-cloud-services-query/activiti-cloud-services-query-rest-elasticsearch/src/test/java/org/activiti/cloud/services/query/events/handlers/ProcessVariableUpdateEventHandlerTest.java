@@ -16,27 +16,42 @@
 
 package org.activiti.cloud.services.query.events.handlers;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.MockitoAnnotations.initMocks;
+
 import org.activiti.cloud.services.query.model.elastic.Variable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.ArgumentMatchers.eq;
 
-@Component
-public class ProcessVariableUpdateEventHandler {
+public class ProcessVariableUpdateEventHandlerTest {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessVariableUpdateEventHandler.class);
+	@InjectMocks
+	private ProcessVariableUpdateEventHandler handler;
 
+	@Mock
 	private VariableUpdater variableUpdater;
 
-	@Autowired
-	public ProcessVariableUpdateEventHandler(VariableUpdater variableUpdater) {
-		this.variableUpdater = variableUpdater;
+	@Before
+	public void setUp() {
+		initMocks(this);
 	}
 
-	public void handle(Variable updatedVariableEntity) {
-		LOGGER.debug("Handling process variable updated event: " + updatedVariableEntity.getName());
-		variableUpdater.updateVariable(updatedVariableEntity);
+	@Test
+	public void handleShouldUpdateVariable() {
+		// given
+		Variable variableEntity = new Variable();
+		variableEntity.setName("var");
+		variableEntity.setValue("v1");
+		variableEntity.setProcessInstanceId("10");
+
+		// when
+		handler.handle(variableEntity);
+
+		// then
+		verify(variableUpdater).updateVariable(eq(variableEntity));
 	}
 
 }

@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 public class ProcessCreatedEventHandler implements QueryEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ProcessCreatedEventHandler.class);
+    
     private ProcessInstanceRepository processInstanceRepository;
 
     @Autowired

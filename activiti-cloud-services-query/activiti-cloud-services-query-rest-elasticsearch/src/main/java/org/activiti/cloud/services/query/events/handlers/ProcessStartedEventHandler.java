@@ -46,7 +46,7 @@ public class ProcessStartedEventHandler implements QueryEventHandler {
 	public void handle(CloudRuntimeEvent<?, ?> event) {
 		CloudProcessStartedEvent startedEvent = (CloudProcessStartedEvent) event;
 		String processInstanceId = startedEvent.getEntity().getId();
-		LOGGER.debug("Handling start of process Instance " + processInstanceId);
+		LOGGER.debug("Handling process started Instance " + processInstanceId);
 
 		Optional<ProcessInstance> findResult = processInstanceRepository.findById(processInstanceId);
 		ProcessInstance processInstanceEntity = findResult.orElseThrow(

@@ -32,7 +32,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Document(indexName = "task", type = "_doc")
+@Document(indexName = "#{esIndexesConfiguration.taskIndex}", type = "_doc")
 public class Task extends ActivitiEntityMetadata implements CloudTask {
 
 	@Id

@@ -44,7 +44,7 @@ public class ProcessCancelledEventHandler implements QueryEventHandler {
 	@Override
 	public void handle(CloudRuntimeEvent<?, ?> event) {
 		CloudProcessCancelledEvent cancelledEvent = (CloudProcessCancelledEvent) event;
-		LOGGER.debug("Handling cancel of process Instance " + cancelledEvent.getEntity().getId());
+		LOGGER.debug("Handling process cancelled Instance " + cancelledEvent.getEntity().getId());
 		updateProcessInstanceStatus(processInstanceRepository.findById(cancelledEvent.getEntity().getId())
 				.orElseThrow(() -> new QueryException(
 						"Unable to find process instance with the given id: " + cancelledEvent.getEntity().getId())),

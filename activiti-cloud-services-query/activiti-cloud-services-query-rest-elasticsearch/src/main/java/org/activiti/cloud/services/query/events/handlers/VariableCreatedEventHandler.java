@@ -31,6 +31,7 @@ import org.activiti.cloud.services.query.model.elastic.ProcessInstance;
 import org.activiti.cloud.services.query.model.elastic.QueryException;
 import org.activiti.cloud.services.query.model.elastic.Task;
 import org.activiti.cloud.services.query.model.elastic.Variable;
+import org.activiti.cloud.services.query.rest.config.ESIndexesConfiguration;
 import org.elasticsearch.action.update.UpdateRequest;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -53,6 +54,7 @@ public class VariableCreatedEventHandler implements QueryEventHandler {
 	private final ProcessInstanceRepository processInstanceRepository;
 	private final TaskRepository taskRepository;
 	private Client esClient;
+	private ESIndexesConfiguration esIndexesConfiguration;
 	// TODO check if it is better to use
 	// org.elasticsearch.common.xcontent.XContentFactory.jsonBuilder() to get the
 	// JSON representations when updating partially.
@@ -61,10 +63,11 @@ public class VariableCreatedEventHandler implements QueryEventHandler {
 	@Autowired
 	public VariableCreatedEventHandler(ProcessInstanceRepository processInstanceRepository,
 			TaskRepository taskRepository, ElasticsearchTemplate esTemplate, Client esClient,
-			ObjectMapper objectMapper) {
+			ESIndexesConfiguration esIndexesConfiguration, ObjectMapper objectMapper) {
 		this.processInstanceRepository = processInstanceRepository;
 		this.taskRepository = taskRepository;
 		this.esClient = esClient;
+		this.esIndexesConfiguration = esIndexesConfiguration;
 		this.objectMapper = objectMapper;
 	}
 
@@ -107,9 +110,8 @@ public class VariableCreatedEventHandler implements QueryEventHandler {
 
 	private UpdateRequest getUpdateRequestForProcessInstance(Variable variable) throws JsonProcessingException {
 		ProcessInstance processInstance = variable.getProcessInstance();
-		// TODO take this index name from somewhere else (.properties, bean...)
-		String indexName = "process_instance";
-		String docType = "_doc";
+		String indexName = esIndexesConfiguration.getProcessInstanceIndex();
+		String docType = esIndexesConfiguration.getProcessInstanceDocumentType();
 		String docId = processInstance.getId();
 
 		if (processInstance.getVariables() == null) {
@@ -132,7 +134,6 @@ public class VariableCreatedEventHandler implements QueryEventHandler {
 		ObjectNode objectNode = objectMapper.createObjectNode();
 		objectNode.set(VARIABLES_FIELD, objectMapper.valueToTree(variables));
 
-		LOGGER.info("UPDATING VARS: {}", objectNode.toString());
 		updateRequest.doc(objectMapper.writeValueAsString(objectNode), XContentType.JSON);
 		return updateRequest;
 	}
@@ -151,8 +152,8 @@ public class VariableCreatedEventHandler implements QueryEventHandler {
 	private UpdateRequest getUpdateRequestForTask(Variable variable) throws JsonProcessingException {
 		Task task = variable.getTask();
 		// TODO take this index name from somewhere else (.properties, bean...)
-		String indexName = "task";
-		String docType = "_doc";
+		String indexName = esIndexesConfiguration.getTaskIndex();
+		String docType = esIndexesConfiguration.getTaskDocumentType();
 		String docId = task.getId();
 
 		if (task.getVariables() == null) {

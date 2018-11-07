@@ -19,13 +19,11 @@ package org.activiti.cloud.services.query.app.repository.elastic;
 import java.io.Serializable;
 import java.util.Optional;
 
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.query.GetQuery;
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EntityFinder {
+public class DocumentFinder {
 
 	public <T, ID extends Serializable> T findById(ElasticsearchRepository<T, ID> repository, ID id,
 			String notFoundMessage) {
@@ -35,11 +33,6 @@ public class EntityFinder {
 
 	private <T> T getEntity(Optional<T> result, String notFoundMessage) {
 		return result.orElseThrow(() -> new IllegalStateException(notFoundMessage));
-	}
-
-	public <T> T findOne(ElasticsearchOperations elasticsearchTemplate, GetQuery query, String notFoundMessage,
-			Class<T> clazz) {
-		return getEntity(Optional.ofNullable(elasticsearchTemplate.queryForObject(query, clazz)), notFoundMessage);
 	}
 
 }

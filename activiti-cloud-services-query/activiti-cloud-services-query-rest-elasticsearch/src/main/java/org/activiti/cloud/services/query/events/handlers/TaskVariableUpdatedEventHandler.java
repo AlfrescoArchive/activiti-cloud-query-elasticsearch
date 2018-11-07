@@ -17,11 +17,15 @@
 package org.activiti.cloud.services.query.events.handlers;
 
 import org.activiti.cloud.services.query.model.elastic.Variable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TaskVariableUpdatedEventHandler {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(TaskVariableUpdatedEventHandler.class);
 
 	private final VariableUpdater variableUpdater;
 
@@ -31,14 +35,7 @@ public class TaskVariableUpdatedEventHandler {
 	}
 
 	public void handle(Variable updatedVariableEntity) {
-		String variableName = updatedVariableEntity.getName();
-		String taskId = updatedVariableEntity.getTaskId();
-//        BooleanExpression predicate = QVariableEntity.variableEntity.name.eq(variableName)
-//                .and(
-//                        QVariableEntity.variableEntity.taskId.eq(String.valueOf(taskId))
-//                );
-//        variableUpdater.update(updatedVariableEntity,
-//                               predicate,
-//                               "Unable to find variable named '" + variableName + "' for task '" + taskId + "'");
+		LOGGER.debug("Handling task variable updated event: " + updatedVariableEntity.getName());
+		variableUpdater.updateVariable(updatedVariableEntity);
 	}
 }

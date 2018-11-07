@@ -39,6 +39,7 @@ import org.activiti.cloud.services.query.app.repository.elastic.TaskRepository;
 import org.activiti.cloud.services.query.model.elastic.ProcessInstance;
 import org.activiti.cloud.services.query.model.elastic.Task;
 import org.activiti.cloud.services.query.model.elastic.Variable;
+import org.activiti.cloud.services.query.rest.config.ESIndexesConfiguration;
 import org.activiti.test.Assertions;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.update.UpdateRequest;
@@ -55,7 +56,11 @@ import org.mockito.Spy;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class VariableEntityCreatedEventHandlerTest {
+public class VariableCreatedEventHandlerTest {
+
+	private static final String PROCESS_INSTANCE_INDEX = "process_instance";
+	private static final String TASK_INDEX = "task";
+	private static final String DOC_TYPE = "_doc";
 
 	@InjectMocks
 	private VariableCreatedEventHandler handler;
@@ -66,6 +71,9 @@ public class VariableEntityCreatedEventHandlerTest {
 	@Mock
 	private TaskRepository taskRepository;
 
+	@Mock
+	private ESIndexesConfiguration esIndexesConfiguration;
+
 	@Spy
 	private ObjectMapper objectMapper = new ObjectMapper();
 
@@ -74,7 +82,8 @@ public class VariableEntityCreatedEventHandlerTest {
 
 	@Before
 	public void setUp() {
-		// Because variable instances have the field taskVariable (from isTaskVariable)
+		// Next configuratuon id because variable instances have the field taskVariable (from isTaskVariable)
+		// that can't be mapped to any property...
 		objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 		initMocks(this);
 	}
@@ -85,22 +94,21 @@ public class VariableEntityCreatedEventHandlerTest {
 		VariableInstanceImpl<String> variableInstance = buildVariable();
 		CloudVariableCreatedEventImpl event = new CloudVariableCreatedEventImpl(variableInstance);
 
-		setUpProcessInstanceMock(variableInstance, event);
+		setUpMocks(variableInstance, event);
 		setUpUpdateExecution();
 		// when
 		handler.handle(event);
 
 		// then
-		// TODO take the index name from another place...
-		Variable variableCreated = verifyUpdateAndGetVariableCreated(variableInstance, "process_instance");
+		Variable variableCreated = verifyUpdateAndGetVariableCreated(variableInstance, PROCESS_INSTANCE_INDEX);
 
 		Assertions.assertThat(variableCreated).hasProcessInstanceId(event.getEntity().getProcessInstanceId())
 				.hasName(event.getEntity().getName()).hasTaskId(event.getEntity().getTaskId())
 				.hasType(event.getEntity().getType()).hasTask(null).hasProcessInstance(null);
 	}
 
-	private void setUpProcessInstanceMock(VariableInstanceImpl<String> variableInstance,
-			CloudVariableCreatedEventImpl event) throws InterruptedException, ExecutionException {
+	private void setUpMocks(VariableInstanceImpl<String> variableInstance, CloudVariableCreatedEventImpl event)
+			throws InterruptedException, ExecutionException {
 		HashMap<String, Set<Variable>> variables = new HashMap<>();
 		variables.put(variableInstance.getType(), new HashSet<>());
 		ProcessInstance processInstance = mock(ProcessInstance.class);
@@ -108,10 +116,15 @@ public class VariableEntityCreatedEventHandlerTest {
 		when(processInstance.getVariables()).thenReturn(variables);
 		when(processInstanceRepository.findById(event.getEntity().getProcessInstanceId()))
 				.thenReturn(Optional.of(processInstance));
+
+		when(esIndexesConfiguration.getProcessInstanceDocumentType()).thenReturn(DOC_TYPE);
+		when(esIndexesConfiguration.getTaskDocumentType()).thenReturn(DOC_TYPE);
+		when(esIndexesConfiguration.getProcessInstanceIndex()).thenReturn(PROCESS_INSTANCE_INDEX);
+		when(esIndexesConfiguration.getTaskIndex()).thenReturn(TASK_INDEX);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void setUpUpdateExecution() throws InterruptedException, ExecutionException {
-		@SuppressWarnings("unchecked")
 		ActionFuture<UpdateResponse> actionFuture = mock(ActionFuture.class);
 		UpdateResponse updateResponse = mock(UpdateResponse.class);
 
@@ -126,7 +139,7 @@ public class VariableEntityCreatedEventHandlerTest {
 		variableInstance.setTaskId(UUID.randomUUID().toString());
 		CloudVariableCreatedEventImpl event = new CloudVariableCreatedEventImpl(variableInstance);
 
-		setUpProcessInstanceMock(variableInstance, event);
+		setUpMocks(variableInstance, event);
 
 		Task task = mock(Task.class);
 		when(taskRepository.findById(event.getEntity().getTaskId())).thenReturn(Optional.of(task));
@@ -137,8 +150,7 @@ public class VariableEntityCreatedEventHandlerTest {
 		handler.handle(event);
 
 		// then
-		// TODO take the index name from another place...
-		Variable variableCreated = verifyUpdateAndGetVariableCreated(variableInstance, "task");
+		Variable variableCreated = verifyUpdateAndGetVariableCreated(variableInstance, TASK_INDEX);
 
 		Assertions.assertThat(variableCreated).hasProcessInstanceId(event.getEntity().getProcessInstanceId())
 				.hasName(event.getEntity().getName()).hasTaskId(event.getEntity().getTaskId())

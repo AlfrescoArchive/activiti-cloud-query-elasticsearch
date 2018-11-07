@@ -26,12 +26,16 @@ import org.activiti.cloud.api.process.model.events.CloudProcessCompletedEvent;
 import org.activiti.cloud.services.query.app.repository.elastic.ProcessInstanceRepository;
 import org.activiti.cloud.services.query.model.elastic.ProcessInstance;
 import org.activiti.cloud.services.query.model.elastic.QueryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProcessCompletedEventHandler implements QueryEventHandler {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(ProcessCompletedEventHandler.class);
+	
 	private ProcessInstanceRepository processInstanceRepository;
 
 	@Autowired
@@ -43,6 +47,7 @@ public class ProcessCompletedEventHandler implements QueryEventHandler {
 	public void handle(CloudRuntimeEvent<?, ?> event) {
 		CloudProcessCompletedEvent completedEvent = (CloudProcessCompletedEvent) event;
 		String processInstanceId = completedEvent.getEntity().getId();
+		LOGGER.debug("Handling completed process Instance " + processInstanceId);
 		Optional<ProcessInstance> findResult = processInstanceRepository.findById(processInstanceId);
 		if (findResult.isPresent()) {
 			ProcessInstance processInstance = findResult.get();

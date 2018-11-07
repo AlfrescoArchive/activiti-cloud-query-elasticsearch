@@ -25,36 +25,42 @@ import org.activiti.cloud.api.process.model.events.CloudProcessResumedEvent;
 import org.activiti.cloud.services.query.app.repository.elastic.ProcessInstanceRepository;
 import org.activiti.cloud.services.query.model.elastic.ProcessInstance;
 import org.activiti.cloud.services.query.model.elastic.QueryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProcessResumedEventHandler implements QueryEventHandler {
 
-    private ProcessInstanceRepository processInstanceRepository;
+	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessResumedEventHandler.class);
 
-    @Autowired
-    public ProcessResumedEventHandler(ProcessInstanceRepository processInstanceRepository) {
-        this.processInstanceRepository = processInstanceRepository;
-    }
+	private ProcessInstanceRepository processInstanceRepository;
 
-    @Override
-    public void handle(CloudRuntimeEvent<?, ?> event) {
-        CloudProcessResumedEvent processResumedEvent = (CloudProcessResumedEvent) event;
-        String processInstanceId = processResumedEvent.getEntity().getId();
-        Optional<ProcessInstance> findResult = processInstanceRepository.findById(processInstanceId);
-        ProcessInstance processInstance = findResult.orElseThrow(() -> new QueryException("Unable to find process instance with the given id: " + processInstanceId));
-        processInstance.setStatus(ProcessInstance.ProcessInstanceStatus.RUNNING);
-        processInstance.setLastModified(new Date(processResumedEvent.getTimestamp()));
-        processInstance.setProcessDefinitionKey(processResumedEvent.getEntity().getProcessDefinitionKey());
-        processInstance.setInitiator(processResumedEvent.getEntity().getInitiator());
-        processInstance.setStartDate(processResumedEvent.getEntity().getStartDate());
-        processInstance.setBusinessKey(processResumedEvent.getEntity().getBusinessKey());
-        processInstanceRepository.save(processInstance);
-    }
+	@Autowired
+	public ProcessResumedEventHandler(ProcessInstanceRepository processInstanceRepository) {
+		this.processInstanceRepository = processInstanceRepository;
+	}
 
-    @Override
-    public String getHandledEvent() {
-        return ProcessRuntimeEvent.ProcessEvents.PROCESS_RESUMED.name();
-    }
+	@Override
+	public void handle(CloudRuntimeEvent<?, ?> event) {
+		CloudProcessResumedEvent processResumedEvent = (CloudProcessResumedEvent) event;
+		String processInstanceId = processResumedEvent.getEntity().getId();
+		LOGGER.debug("Handling resumed process Instance " + processInstanceId);
+		Optional<ProcessInstance> findResult = processInstanceRepository.findById(processInstanceId);
+		ProcessInstance processInstance = findResult.orElseThrow(
+				() -> new QueryException("Unable to find process instance with the given id: " + processInstanceId));
+		processInstance.setStatus(ProcessInstance.ProcessInstanceStatus.RUNNING);
+		processInstance.setLastModified(new Date(processResumedEvent.getTimestamp()));
+		processInstance.setProcessDefinitionKey(processResumedEvent.getEntity().getProcessDefinitionKey());
+		processInstance.setInitiator(processResumedEvent.getEntity().getInitiator());
+		processInstance.setStartDate(processResumedEvent.getEntity().getStartDate());
+		processInstance.setBusinessKey(processResumedEvent.getEntity().getBusinessKey());
+		processInstanceRepository.save(processInstance);
+	}
+
+	@Override
+	public String getHandledEvent() {
+		return ProcessRuntimeEvent.ProcessEvents.PROCESS_RESUMED.name();
+	}
 }
