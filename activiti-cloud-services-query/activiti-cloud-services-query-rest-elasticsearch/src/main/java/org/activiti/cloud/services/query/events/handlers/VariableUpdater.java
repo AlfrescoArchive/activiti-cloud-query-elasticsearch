@@ -45,6 +45,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class VariableUpdater {
 
 	private static final String VARIABLES_FIELD = "variables";
+	
 	private ProcessInstanceRepository processInstanceRepository;
 	private TaskRepository taskRepository;
 	private ObjectMapper objectMapper;
@@ -85,8 +86,13 @@ public class VariableUpdater {
 			throw new QueryException("Unable to find variable with name: " + variableName + partialExceptionMessage);
 		}
 
-		variablesByType.remove(updatedVariableEntity);
-		variablesByType.add(updatedVariableEntity);
+		for (Variable var : variablesByType) {
+			if (var.equals(updatedVariableEntity)) {
+				var.setLastUpdatedTime(updatedVariableEntity.getLastUpdatedTime());
+				var.setValue(updatedVariableEntity.getValue());
+				break;
+			}
+		}
 
 		UpdateRequest updateRequest = getUpdateRequest(updatedVariableEntity);
 		try {
@@ -97,29 +103,23 @@ public class VariableUpdater {
 		}
 	}
 
-	public Map<String, Set<Variable>> findVariablesFromParent(VariableInstance variableInstance) {
+	private Map<String, Set<Variable>> findVariablesFromParent(VariableInstance variableInstance) {
 		Map<String, Set<Variable>> variables;
 		if (variableInstance.isTaskVariable()) {
-//			Task task = documentFinder.findById(taskRepository, variableInstance.getTaskId(),
-//					"Unable to find task with the given id: " + variableInstance.getTaskId());
-			Task task = taskRepository.findById(variableInstance.getTaskId()).orElseThrow(
-					() -> new QueryException("Unable to find task with the given id: " + variableInstance.getTaskId()));
+			Task task = documentFinder.findById(taskRepository, variableInstance.getTaskId(),
+					"Unable to find task with the given id: " + variableInstance.getTaskId());
 			variables = task.getVariables();
 		} else {
-//			ProcessInstance processInstance = documentFinder.findById(processInstanceRepository,
-//					variableInstance.getProcessInstanceId(),
-//					"Unable to find process instance with the given id: " + variableInstance.getProcessInstanceId());
-			ProcessInstance processInstance = processInstanceRepository
-					.findById(variableInstance.getProcessInstanceId())
-					.orElseThrow(() -> new QueryException("Unable to find process instance with the given id: "
-							+ variableInstance.getProcessInstanceId()));
+			ProcessInstance processInstance = documentFinder.findById(processInstanceRepository,
+					variableInstance.getProcessInstanceId(),
+					"Unable to find process instance with the given id: " + variableInstance.getProcessInstanceId());
 			variables = processInstance.getVariables();
 		}
 
 		return variables == null ? new HashMap<>() : variables;
 	}
 
-	public void updateVariables(UpdateRequest updateRequest, Map<String, Set<Variable>> variables)
+	private void updateVariables(UpdateRequest updateRequest, Map<String, Set<Variable>> variables)
 			throws InterruptedException, ExecutionException, JsonProcessingException {
 		ObjectNode objectNode = objectMapper.createObjectNode();
 		objectNode.set(VARIABLES_FIELD, objectMapper.valueToTree(variables));
@@ -128,7 +128,7 @@ public class VariableUpdater {
 		esClient.update(updateRequest).get();
 	}
 
-	public UpdateRequest getUpdateRequest(VariableInstance variableInstance) {
+	private UpdateRequest getUpdateRequest(VariableInstance variableInstance) {
 		UpdateRequest updateRequest = new UpdateRequest();
 		if (!variableInstance.isTaskVariable()) {
 			updateRequest.index(esIndexesConfiguration.getProcessInstanceIndex());

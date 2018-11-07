@@ -93,8 +93,6 @@ public class VariableCreatedEventHandler implements QueryEventHandler {
 	private void persist(CloudRuntimeEvent<?, ?> event, Variable variable) {
 		try {
 			if (variable.isTaskVariable()) {
-				// TODO check if it must not update in process instance...(tasks variables could
-				// also be in the process instance?...)
 				UpdateRequest updateRequest = getUpdateRequestForTask(variable);
 				esClient.update(updateRequest).get();
 				return;
@@ -151,7 +149,6 @@ public class VariableCreatedEventHandler implements QueryEventHandler {
 
 	private UpdateRequest getUpdateRequestForTask(Variable variable) throws JsonProcessingException {
 		Task task = variable.getTask();
-		// TODO take this index name from somewhere else (.properties, bean...)
 		String indexName = esIndexesConfiguration.getTaskIndex();
 		String docType = esIndexesConfiguration.getTaskDocumentType();
 		String docId = task.getId();
