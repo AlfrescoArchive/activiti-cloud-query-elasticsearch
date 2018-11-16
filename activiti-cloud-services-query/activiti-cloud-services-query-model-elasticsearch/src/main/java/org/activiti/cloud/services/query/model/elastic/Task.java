@@ -32,7 +32,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Document(indexName = "#{esIndexesConfiguration.taskIndex}", type = "_doc")
+@Document(indexName = "#{esIndexesConfiguration.taskIndex}", type = "#{esIndexesConfiguration.taskDocumentType}")
 public class Task extends ActivitiEntityMetadata implements CloudTask {
 
     @Id
@@ -72,27 +72,10 @@ public class Task extends ActivitiEntityMetadata implements CloudTask {
     public Task() {
     }
 
-    public Task(
-            String id,
-            String assignee,
-            String name,
-            String description,
-            Date createTime,
-            Date dueDate,
-            int priority,
-            String category,
-            String processDefinitionId,
-            String processInstanceId,
-            String serviceName,
-            String serviceFullName,
-            String serviceVersion,
-            String appName,
-            String appVersion,
-            TaskStatus status,
-            Date lastModified,
-            Date claimedDate,
-            String owner,
-            String parentTaskId) {
+    public Task(String id, String assignee, String name, String description, Date createTime, Date dueDate,
+            int priority, String category, String processDefinitionId, String processInstanceId, String serviceName,
+            String serviceFullName, String serviceVersion, String appName, String appVersion, TaskStatus status,
+            Date lastModified, Date claimedDate, String owner, String parentTaskId) {
         super(serviceName, serviceFullName, serviceVersion, appName, appVersion);
         this.id = id;
         this.assignee = assignee;
@@ -257,61 +240,21 @@ public class Task extends ActivitiEntityMetadata implements CloudTask {
         this.lastModifiedFrom = lastModifiedFrom;
     }
 
-    /**
-     * @return the processInstance
-     */
     public ProcessInstance getProcessInstance() {
         return this.processInstance;
     }
 
-    /**
-     * @param processInstance the processInstance to set
-     */
     public void setProcessInstance(ProcessInstance processInstance) {
         this.processInstance = processInstance;
     }
 
-    /**
-     * @return the variableEntities
-     */
     public Map<String, Set<Variable>> getVariables() {
         return this.variables;
     }
 
-    /**
-     * @param variables the variableEntities to set
-     */
     public void setVariables(Map<String, Set<Variable>> variables) {
         this.variables = variables;
     }
-
-//	/**
-//	 * @return the taskCandidateUsers
-//	 */
-//	public Set<TaskCandidateUser> getTaskCandidateUsers() {
-//		return this.taskCandidateUsers;
-//	}
-//
-//	/**
-//	 * @param taskCandidateUsers the taskCandidateUsers to set
-//	 */
-//	public void setTaskCandidateUsers(Set<TaskCandidateUser> taskCandidateUsers) {
-//		this.taskCandidateUsers = taskCandidateUsers;
-//	}
-//
-//	/**
-//	 * @return the taskCandidateUsers
-//	 */
-//	public Set<TaskCandidateGroup> getTaskCandidateGroups() {
-//		return this.taskCandidateGroups;
-//	}
-//
-//	/**
-//	 * @param taskCandidateGroups the taskCandidateGroups to set
-//	 */
-//	public void setTaskCandidateGroups(Set<TaskCandidateGroup> taskCandidateGroups) {
-//		this.taskCandidateGroups = taskCandidateGroups;
-//	}
 
     @Override
     public String getParentTaskId() {

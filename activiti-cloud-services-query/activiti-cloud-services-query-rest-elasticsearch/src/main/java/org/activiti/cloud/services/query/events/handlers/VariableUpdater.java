@@ -54,8 +54,12 @@ public class VariableUpdater {
     private DocumentFinder documentFinder;
 
     @Autowired
-    public VariableUpdater(ProcessInstanceRepository processInstanceRepository, TaskRepository taskRepository,
-            ObjectMapper objectMapper, ESIndexesConfiguration esIndexesConfiguration, Client esClient,
+    public VariableUpdater(
+            ProcessInstanceRepository processInstanceRepository,
+            TaskRepository taskRepository,
+            ObjectMapper objectMapper,
+            ESIndexesConfiguration esIndexesConfiguration,
+            Client esClient,
             DocumentFinder documentFinder) {
         this.processInstanceRepository = processInstanceRepository;
         this.taskRepository = taskRepository;

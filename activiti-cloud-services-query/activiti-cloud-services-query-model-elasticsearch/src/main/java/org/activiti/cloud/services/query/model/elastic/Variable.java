@@ -158,6 +158,7 @@ public class Variable extends ActivitiEntityMetadata implements CloudVariableIns
         this.value = new VariableValue<>(value);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> T getValue() {
         return (T) value.getValue();

@@ -12,7 +12,7 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.springframework.format.annotation.DateTimeFormat;
 
-@Document(indexName = "#{esIndexesConfiguration.processInstanceIndex}", type = "_doc")
+@Document(indexName = "#{esIndexesConfiguration.processInstanceIndex}", type = "#{esIndexesConfiguration.processInstanceDocumentType}")
 public class ProcessInstance extends ActivitiEntityMetadata implements CloudProcessInstance {
 
     @Id
