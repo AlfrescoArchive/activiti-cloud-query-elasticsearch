@@ -1,10 +1,7 @@
 package org.activiti.cloud.services.query.model.elastic;
 
-//import javax.persistence.MappedSuperclass;
-
 import org.activiti.cloud.api.model.shared.CloudRuntimeEntity;
 
-//@MappedSuperclass
 public abstract class ActivitiEntityMetadata implements CloudRuntimeEntity {
 
     protected String serviceName;
@@ -18,11 +15,12 @@ public abstract class ActivitiEntityMetadata implements CloudRuntimeEntity {
 
     }
 
-    public ActivitiEntityMetadata(String serviceName,
-                                  String serviceFullName,
-                                  String serviceVersion,
-                                  String appName,
-                                  String appVersion) {
+    public ActivitiEntityMetadata(
+            String serviceName,
+            String serviceFullName,
+            String serviceVersion,
+            String appName,
+            String appVersion) {
         this.serviceName = serviceName;
         this.serviceFullName = serviceFullName;
         this.serviceVersion = serviceVersion;

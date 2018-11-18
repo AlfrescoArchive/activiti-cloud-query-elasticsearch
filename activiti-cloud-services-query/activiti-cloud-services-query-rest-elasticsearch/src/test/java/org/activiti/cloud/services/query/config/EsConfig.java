@@ -18,26 +18,26 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @EnableElasticsearchRepositories
 public class EsConfig {
 
-	@Value("${elasticsearch.host}")
-	private String esHost;
+    @Value("${elasticsearch.host}")
+    private String esHost;
 
-	@Value("${elasticsearch.port}")
-	private int esPort;
+    @Value("${elasticsearch.port}")
+    private int esPort;
 
-	@Value("${elasticsearch.clustername}")
-	private String esClusterName;
+    @Value("${elasticsearch.clustername}")
+    private String esClusterName;
 
-	@Bean
-	public Client client() throws Exception {
-		Settings settings = Settings.builder().put("cluster.name", esClusterName).build();
-		TransportClient client = new PreBuiltTransportClient(settings);
-		client.addTransportAddress(new TransportAddress(InetAddress.getByName(esHost), esPort));
-		return client;
-	}
+    @Bean
+    public Client client() throws Exception {
+        Settings settings = Settings.builder().put("cluster.name", esClusterName).build();
+        TransportClient client = new PreBuiltTransportClient(settings);
+        client.addTransportAddress(new TransportAddress(InetAddress.getByName(esHost), esPort));
+        return client;
+    }
 
-	@Bean
-	public ElasticsearchOperations elasticsearchTemplate() throws Exception {
-		return new ElasticsearchTemplate(client());
-	}
+    @Bean
+    public ElasticsearchOperations elasticsearchTemplate() throws Exception {
+        return new ElasticsearchTemplate(client());
+    }
 
 }

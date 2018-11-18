@@ -17,36 +17,26 @@
 package org.activiti.cloud.services.query.events.handlers;
 
 import org.activiti.cloud.services.query.model.elastic.Variable;
-import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.elasticsearch.core.query.StringQuery;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProcessVariableUpdateEventHandler {
 
-	private final VariableUpdater variableUpdater;
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessVariableUpdateEventHandler.class);
 
-	@Autowired
-	public ProcessVariableUpdateEventHandler(VariableUpdater variableUpdater) {
-		this.variableUpdater = variableUpdater;
-	}
+    private VariableUpdater variableUpdater;
 
-	public void handle(Variable updatedVariableEntity) {
-		String variableName = updatedVariableEntity.getName();
-		String processInstanceId = updatedVariableEntity.getProcessInstanceId();
-		// TODO complete this method pls
+    @Autowired
+    public ProcessVariableUpdateEventHandler(VariableUpdater variableUpdater) {
+        this.variableUpdater = variableUpdater;
+    }
 
-		// BooleanExpression predicate =
-		// QVariableEntity.variableEntity.name.eq(variableName)
-//                .and(
-//                        QVariableEntity.variableEntity.processInstanceId.eq(String.valueOf(processInstanceId))
-//                );
-		
-//		new QueryStringQueryBuilder().
-//		StringQuery stringQuery = new StringQuery(termQuery("name", variableName).termQuery("name", variableName).toString());
-//        variableUpdater.update(updatedVariableEntity,
-//                               null, 
-//                               "Unable to find variable named '" + variableName + "' for process instance '" + processInstanceId + "'");
-	}
+    public void handle(Variable updatedVariableEntity) {
+        LOGGER.debug("Handling process variable updated event: " + updatedVariableEntity.getName());
+        variableUpdater.updateVariable(updatedVariableEntity);
+    }
+
 }

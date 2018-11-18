@@ -39,55 +39,55 @@ import org.mockito.Mock;
 
 public class ProcessCreatedEventHandlerTest {
 
-	@InjectMocks
-	private ProcessCreatedEventHandler handler;
+    @InjectMocks
+    private ProcessCreatedEventHandler handler;
 
-	@Mock
-	private ProcessInstanceRepository processInstanceRepository;
+    @Mock
+    private ProcessInstanceRepository processInstanceRepository;
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-	@Test
-	public void handleShouldUpdateCurrentProcessInstanceStateToCreated() {
-		// given
-		CloudProcessCreatedEvent event = buildProcessCreatedEvent();
+    @Test
+    public void handleShouldUpdateCurrentProcessInstanceStateToCreated() {
+        // given
+        CloudProcessCreatedEvent event = buildProcessCreatedEvent();
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		ArgumentCaptor<ProcessInstance> argumentCaptor = ArgumentCaptor.forClass(ProcessInstance.class);
-		verify(processInstanceRepository).save(argumentCaptor.capture());
+        ArgumentCaptor<ProcessInstance> argumentCaptor = ArgumentCaptor.forClass(ProcessInstance.class);
+        verify(processInstanceRepository).save(argumentCaptor.capture());
 
-		ProcessInstance processInstanceEntity = argumentCaptor.getValue();
-		Assertions.assertThat(processInstanceEntity).hasId(event.getEntity().getId())
-				.hasProcessDefinitionId(event.getEntity().getProcessDefinitionId())
-				.hasServiceName(event.getServiceName())
-				.hasProcessDefinitionKey(event.getEntity().getProcessDefinitionKey())
-				.hasStatus(ProcessInstance.ProcessInstanceStatus.CREATED);
-	}
+        ProcessInstance processInstanceEntity = argumentCaptor.getValue();
+        Assertions.assertThat(processInstanceEntity).hasId(event.getEntity().getId())
+                .hasProcessDefinitionId(event.getEntity().getProcessDefinitionId())
+                .hasServiceName(event.getServiceName())
+                .hasProcessDefinitionKey(event.getEntity().getProcessDefinitionKey())
+                .hasStatus(ProcessInstance.ProcessInstanceStatus.CREATED);
+    }
 
-	private CloudProcessCreatedEvent buildProcessCreatedEvent() {
-		ProcessInstanceImpl processInstance = new ProcessInstanceImpl();
-		processInstance.setId(UUID.randomUUID().toString());
-		processInstance.setProcessDefinitionId(UUID.randomUUID().toString());
-		processInstance.setBusinessKey("myKey");
-		CloudProcessCreatedEventImpl event = new CloudProcessCreatedEventImpl(processInstance);
-		event.setServiceName("runtime-bundle-a");
-		return event;
-	}
+    private CloudProcessCreatedEvent buildProcessCreatedEvent() {
+        ProcessInstanceImpl processInstance = new ProcessInstanceImpl();
+        processInstance.setId(UUID.randomUUID().toString());
+        processInstance.setProcessDefinitionId(UUID.randomUUID().toString());
+        processInstance.setBusinessKey("myKey");
+        CloudProcessCreatedEventImpl event = new CloudProcessCreatedEventImpl(processInstance);
+        event.setServiceName("runtime-bundle-a");
+        return event;
+    }
 
-	@Test
-	public void getHandledEventShouldReturnProcessCreatedEvent() {
-		// when
-		String handledEvent = handler.getHandledEvent();
+    @Test
+    public void getHandledEventShouldReturnProcessCreatedEvent() {
+        // when
+        String handledEvent = handler.getHandledEvent();
 
-		// then
-		assertThat(handledEvent).isEqualTo(ProcessRuntimeEvent.ProcessEvents.PROCESS_CREATED.name());
-	}
+        // then
+        assertThat(handledEvent).isEqualTo(ProcessRuntimeEvent.ProcessEvents.PROCESS_CREATED.name());
+    }
 }

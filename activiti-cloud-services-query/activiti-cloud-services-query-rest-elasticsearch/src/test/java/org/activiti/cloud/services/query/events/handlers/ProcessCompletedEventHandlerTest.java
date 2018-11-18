@@ -43,64 +43,64 @@ import org.mockito.Mock;
 
 public class ProcessCompletedEventHandlerTest {
 
-	@InjectMocks
-	private ProcessCompletedEventHandler handler;
+    @InjectMocks
+    private ProcessCompletedEventHandler handler;
 
-	@Mock
-	private ProcessInstanceRepository processInstanceRepository;
+    @Mock
+    private ProcessInstanceRepository processInstanceRepository;
 
-	@Rule
-	public ExpectedException expectedException = ExpectedException.none();
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
-	@Before
-	public void setUp() {
-		initMocks(this);
-	}
+    @Before
+    public void setUp() {
+        initMocks(this);
+    }
 
-	@Test
-	public void handleShouldUpdateCurrentProcessInstanceStateToCompleted() {
-		// given
-		CloudProcessCompletedEvent event = createProcessCompletedEvent();
+    @Test
+    public void handleShouldUpdateCurrentProcessInstanceStateToCompleted() {
+        // given
+        CloudProcessCompletedEvent event = createProcessCompletedEvent();
 
-		ProcessInstance currentProcessInstanceEntity = mock(ProcessInstance.class);
-		given(processInstanceRepository.findById(event.getEntity().getId()))
-				.willReturn(Optional.of(currentProcessInstanceEntity));
+        ProcessInstance currentProcessInstanceEntity = mock(ProcessInstance.class);
+        given(processInstanceRepository.findById(event.getEntity().getId()))
+                .willReturn(Optional.of(currentProcessInstanceEntity));
 
-		// when
-		handler.handle(event);
+        // when
+        handler.handle(event);
 
-		// then
-		verify(processInstanceRepository).save(currentProcessInstanceEntity);
-		verify(currentProcessInstanceEntity).setStatus(ProcessInstance.ProcessInstanceStatus.COMPLETED);
-		verify(currentProcessInstanceEntity).setLastModified(any(Date.class));
-	}
+        // then
+        verify(processInstanceRepository).save(currentProcessInstanceEntity);
+        verify(currentProcessInstanceEntity).setStatus(ProcessInstance.ProcessInstanceStatus.COMPLETED);
+        verify(currentProcessInstanceEntity).setLastModified(any(Date.class));
+    }
 
-	private CloudProcessCompletedEvent createProcessCompletedEvent() {
-		ProcessInstanceImpl processInstance = new ProcessInstanceImpl();
-		processInstance.setId(UUID.randomUUID().toString());
-		return new CloudProcessCompletedEventImpl(processInstance);
-	}
+    private CloudProcessCompletedEvent createProcessCompletedEvent() {
+        ProcessInstanceImpl processInstance = new ProcessInstanceImpl();
+        processInstance.setId(UUID.randomUUID().toString());
+        return new CloudProcessCompletedEventImpl(processInstance);
+    }
 
-	@Test
-	public void handleShouldThrowExceptionWhenRelatedProcessInstanceIsNotFound() {
-		// given
-		CloudProcessCompletedEvent event = createProcessCompletedEvent();
-		given(processInstanceRepository.findById("200")).willReturn(Optional.empty());
+    @Test
+    public void handleShouldThrowExceptionWhenRelatedProcessInstanceIsNotFound() {
+        // given
+        CloudProcessCompletedEvent event = createProcessCompletedEvent();
+        given(processInstanceRepository.findById("200")).willReturn(Optional.empty());
 
-		// then
-		expectedException.expect(QueryException.class);
-		expectedException.expectMessage("Unable to find process instance with the given id: ");
+        // then
+        expectedException.expect(QueryException.class);
+        expectedException.expectMessage("Unable to find process instance with the given id: ");
 
-		// when
-		handler.handle(event);
-	}
+        // when
+        handler.handle(event);
+    }
 
-	@Test
-	public void getHandledEventShouldReturnProcessCompletedEvent() {
-		// when
-		String handledEvent = handler.getHandledEvent();
+    @Test
+    public void getHandledEventShouldReturnProcessCompletedEvent() {
+        // when
+        String handledEvent = handler.getHandledEvent();
 
-		// then
-		assertThat(handledEvent).isEqualTo(ProcessRuntimeEvent.ProcessEvents.PROCESS_COMPLETED.name());
-	}
+        // then
+        assertThat(handledEvent).isEqualTo(ProcessRuntimeEvent.ProcessEvents.PROCESS_COMPLETED.name());
+    }
 }

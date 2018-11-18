@@ -36,8 +36,8 @@ public class QueryEventHandlerContext {
 
     @Autowired
     public QueryEventHandlerContext(Set<QueryEventHandler> handlers) {
-        this.handlers = handlers.stream().collect(Collectors.toMap(QueryEventHandler::getHandledEvent,
-                                                                   Function.identity()));
+        this.handlers = handlers.stream()
+                .collect(Collectors.toMap(QueryEventHandler::getHandledEvent, Function.identity()));
     }
 
     public void handle(CloudRuntimeEvent<?, ?>... events) {

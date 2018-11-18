@@ -17,37 +17,24 @@
 package org.activiti.cloud.services.query.events.handlers;
 
 import org.activiti.cloud.api.model.shared.events.CloudVariableDeletedEvent;
-import org.activiti.cloud.services.query.app.repository.elastic.EntityFinder;
-import org.activiti.cloud.services.query.app.repository.elastic.ProcessInstanceRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TaskVariableDeletedEventHandler {
 
-	private final ProcessInstanceRepository processInstanceRepository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskVariableDeletedEventHandler.class);
+    private VariableUpdater variableUpdater;
 
-	private final EntityFinder entityFinder;
+    @Autowired
+    public TaskVariableDeletedEventHandler(VariableUpdater variableUpdater) {
+        this.variableUpdater = variableUpdater;
+    }
 
-	@Autowired
-	public TaskVariableDeletedEventHandler(ProcessInstanceRepository processInstanceRepository,
-			EntityFinder entityFinder) {
-		this.processInstanceRepository = processInstanceRepository;
-		this.entityFinder = entityFinder;
-	}
-
-	public void handle(CloudVariableDeletedEvent event) {
-		String variableName = event.getEntity().getName();
-		String taskId = event.getEntity().getTaskId();
-//        BooleanExpression predicate = QVariableEntity.variableEntity.taskId.eq(taskId)
-//                .and(
-//                        QVariableEntity.variableEntity.name.eq(variableName)
-//
-//                ).and(QVariableEntity.variableEntity.markedAsDeleted.eq(Boolean.FALSE));
-//        VariableEntity variableEntity = entityFinder.findOne(variableRepository,
-//                                                             predicate,
-//                                                             "Unable to find variableEntity with name '" + variableName + "' for task '" + taskId + "'");
-//        variableEntity.setMarkedAsDeleted(true);
-//        variableRepository.save(variableEntity);
-	}
+    public void handle(CloudVariableDeletedEvent event) {
+        LOGGER.debug("Handling task variable deleted event: " + event.getEntity().getName());
+        variableUpdater.markVariableAsDeleted(event.getEntity());
+    }
 }

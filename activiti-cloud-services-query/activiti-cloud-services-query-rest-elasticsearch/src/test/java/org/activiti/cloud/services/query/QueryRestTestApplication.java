@@ -16,16 +16,18 @@
 
 package org.activiti.cloud.services.query;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.activiti.cloud.services.query.rest.config.ESIndexesConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
+import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
-public class QueryRestTestApplication {	
+public class QueryRestTestApplication {
 
     public static void main(String[] args) {
-            SpringApplication.run(QueryRestTestApplication.class, args);
+        ApplicationContext pls = SpringApplication.run(QueryRestTestApplication.class, args);
+        ESIndexesConfiguration indexesConfiguration = (ESIndexesConfiguration) pls.getBean("esIndexesConfiguration");
+        System.out.println(indexesConfiguration.getProcessInstanceIndex());
     }
 
 }

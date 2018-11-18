@@ -17,7 +17,7 @@
 package org.activiti.cloud.services.query.rest.config;
 
 import org.activiti.cloud.services.query.model.elastic.ProcessInstance;
-import org.activiti.cloud.services.query.model.elastic.Variable;
+import org.activiti.cloud.services.query.model.elastic.Task;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
@@ -30,17 +30,15 @@ import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurerAdapt
 @ComponentScan(basePackages = { "org.activiti.cloud.services.query.model.elastic" })
 public class QueryRepositoryConfig extends RepositoryRestConfigurerAdapter {
 
-	@Override
-	public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
+    @Override
+    public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
 
-		// Expose only repositories annotated with @RepositoryRestResource
-		config.setRepositoryDetectionStrategy(RepositoryDetectionStrategies.ANNOTATED);
+        // Expose only repositories annotated with @RepositoryRestResource
+        config.setRepositoryDetectionStrategy(RepositoryDetectionStrategies.ANNOTATED);
 
-		// by default the ids are not exposed the the REST API
-		config.exposeIdsFor(ProcessInstance.class);
-		// TODO include Task
-//		config.exposeIdsFor(TaskEntity.class);
-		config.exposeIdsFor(Variable.class);
-	}
+        // by default the ids are not exposed the the REST API
+        config.exposeIdsFor(ProcessInstance.class);
+        config.exposeIdsFor(Task.class);
+    }
 
 }

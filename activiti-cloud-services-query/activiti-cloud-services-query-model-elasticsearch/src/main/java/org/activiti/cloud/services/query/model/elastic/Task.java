@@ -32,308 +32,236 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-@Document(indexName = "task", type = "_doc")
+@Document(indexName = "#{esIndexesConfiguration.taskIndex}", type = "#{esIndexesConfiguration.taskDocumentType}")
 public class Task extends ActivitiEntityMetadata implements CloudTask {
 
-	@Id
-	private String id;
-	private String assignee;
-	private String name;
-	private String description;
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-	private Date createdDate;
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-	private Date dueDate;
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-	private Date claimedDate;
-	private int priority;
-	private String category;
-	private String processDefinitionId;
-	private String processInstanceId;
-	@Enumerated(EnumType.STRING)
-	private TaskStatus status;
-	private String owner;
-	private String parentTaskId;
+    @Id
+    private String id;
+    private String assignee;
+    private String name;
+    private String description;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private Date createdDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private Date dueDate;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    private Date claimedDate;
+    private int priority;
+    private String category;
+    private String processDefinitionId;
+    private String processInstanceId;
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status;
+    private String owner;
+    private String parentTaskId;
 
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-	private Date lastModified;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private Date lastModified;
 
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-	private Date lastModifiedTo;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private Date lastModifiedTo;
 
-	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-	private Date lastModifiedFrom;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private Date lastModifiedFrom;
 
-	@JsonIgnore
-//	@ManyToOne(optional = true, fetch = FetchType.LAZY)
-//	@JoinColumn(name = "processInstanceId", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @javax.persistence.ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
-	private ProcessInstance processInstance;
+    @JsonIgnore
+    private ProcessInstance processInstance;
 
-//	@JsonIgnore
-//	@OneToMany(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "taskId", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @javax.persistence.ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
-//	private Set<TaskCandidateUser> taskCandidateUsers;
+    private Map<String, Set<Variable>> variables;
 
-//	@JsonIgnore
-//	@OneToMany(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "taskId", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @javax.persistence.ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
-//	private Set<TaskCandidateGroup> taskCandidateGroups;
+    public Task() {
+    }
 
-//	@JsonIgnore
-//	@OneToMany(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "taskId", referencedColumnName = "id", insertable = false, updatable = false, foreignKey = @javax.persistence.ForeignKey(value = ConstraintMode.NO_CONSTRAINT, name = "none"))
-	private Map<String, Set<Variable>> variables;	
+    public Task(String id, String assignee, String name, String description, Date createTime, Date dueDate,
+            int priority, String category, String processDefinitionId, String processInstanceId, String serviceName,
+            String serviceFullName, String serviceVersion, String appName, String appVersion, TaskStatus status,
+            Date lastModified, Date claimedDate, String owner, String parentTaskId) {
+        super(serviceName, serviceFullName, serviceVersion, appName, appVersion);
+        this.id = id;
+        this.assignee = assignee;
+        this.name = name;
+        this.description = description;
+        this.createdDate = createTime;
+        this.dueDate = dueDate;
+        this.priority = priority;
+        this.category = category;
+        this.processDefinitionId = processDefinitionId;
+        this.processInstanceId = processInstanceId;
+        this.status = status;
+        this.lastModified = lastModified;
+        this.claimedDate = claimedDate;
+        this.owner = owner;
+        this.parentTaskId = parentTaskId;
+    }
 
-	public Task() {
-	}
+    @Override
+    public String getId() {
+        return id;
+    }
 
-	public Task(
-			String id,
-			String assignee,
-			String name,
-			String description,
-			Date createTime,
-			Date dueDate,
-			int priority,
-			String category,
-			String processDefinitionId,
-			String processInstanceId,
-			String serviceName,
-			String serviceFullName,
-			String serviceVersion,
-			String appName,
-			String appVersion,
-			TaskStatus status,
-			Date lastModified,
-			Date claimedDate,
-			String owner,
-			String parentTaskId) {
-		super(serviceName, serviceFullName, serviceVersion, appName, appVersion);
-		this.id = id;
-		this.assignee = assignee;
-		this.name = name;
-		this.description = description;
-		this.createdDate = createTime;
-		this.dueDate = dueDate;
-		this.priority = priority;
-		this.category = category;
-		this.processDefinitionId = processDefinitionId;
-		this.processInstanceId = processInstanceId;
-		this.status = status;
-		this.lastModified = lastModified;
-		this.claimedDate = claimedDate;
-		this.owner = owner;
-		this.parentTaskId = parentTaskId;
-	}
+    @Override
+    public String getAssignee() {
+        return assignee;
+    }
 
-	@Override
-	public String getId() {
-		return id;
-	}
+    @Override
+    public String getName() {
+        return name;
+    }
 
-	@Override
-	public String getAssignee() {
-		return assignee;
-	}
+    @Override
+    public String getDescription() {
+        return description;
+    }
 
-	@Override
-	public String getName() {
-		return name;
-	}
+    @Override
+    public Date getCreatedDate() {
+        return createdDate;
+    }
 
-	@Override
-	public String getDescription() {
-		return description;
-	}
+    @Override
+    public Date getDueDate() {
+        return dueDate;
+    }
 
-	@Override
-	public Date getCreatedDate() {
-		return createdDate;
-	}
+    @Override
+    public int getPriority() {
+        return priority;
+    }
 
-	@Override
-	public Date getDueDate() {
-		return dueDate;
-	}
+    public String getCategory() {
+        return category;
+    }
 
-	@Override
-	public int getPriority() {
-		return priority;
-	}
+    @Override
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
+    }
 
-	public String getCategory() {
-		return category;
-	}
+    @Override
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
 
-	@Override
-	public String getProcessDefinitionId() {
-		return processDefinitionId;
-	}
+    public boolean isStandAlone() {
+        return processInstanceId == null;
+    }
 
-	@Override
-	public String getProcessInstanceId() {
-		return processInstanceId;
-	}
+    @Override
+    public TaskStatus getStatus() {
+        return status;
+    }
 
-	public boolean isStandAlone() {
-		return processInstanceId == null;
-	}
+    public Date getLastModified() {
+        return lastModified;
+    }
 
-	@Override
-	public TaskStatus getStatus() {
-		return status;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public Date getLastModified() {
-		return lastModified;
-	}
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setAssignee(String assignee) {
-		this.assignee = assignee;
-	}
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
 
-	public void setDescription(String description) {
-		this.description = description;
-	}
+    public void setDueDate(Date dueDate) {
+        this.dueDate = dueDate;
+    }
 
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
 
-	public void setDueDate(Date dueDate) {
-		this.dueDate = dueDate;
-	}
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
-	public void setPriority(int priority) {
-		this.priority = priority;
-	}
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
 
-	public void setCategory(String category) {
-		this.category = category;
-	}
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
+    }
 
-	public void setProcessDefinitionId(String processDefinitionId) {
-		this.processDefinitionId = processDefinitionId;
-	}
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
 
-	public void setProcessInstanceId(String processInstanceId) {
-		this.processInstanceId = processInstanceId;
-	}
+    public void setLastModified(Date lastModified) {
+        this.lastModified = lastModified;
+    }
 
-	public void setStatus(TaskStatus status) {
-		this.status = status;
-	}
+    @Transient
+    public Date getLastModifiedTo() {
+        return lastModifiedTo;
+    }
 
-	public void setLastModified(Date lastModified) {
-		this.lastModified = lastModified;
-	}
+    public void setLastModifiedTo(Date lastModifiedTo) {
+        this.lastModifiedTo = lastModifiedTo;
+    }
 
-	@Transient
-	public Date getLastModifiedTo() {
-		return lastModifiedTo;
-	}
+    @Transient
+    public Date getLastModifiedFrom() {
+        return lastModifiedFrom;
+    }
 
-	public void setLastModifiedTo(Date lastModifiedTo) {
-		this.lastModifiedTo = lastModifiedTo;
-	}
+    @Override
+    public Date getClaimedDate() {
+        return claimedDate;
+    }
 
-	@Transient
-	public Date getLastModifiedFrom() {
-		return lastModifiedFrom;
-	}
+    public void setClaimedDate(Date claimedDate) {
+        this.claimedDate = claimedDate;
+    }
 
-	@Override
-	public Date getClaimedDate() {
-		return claimedDate;
-	}
+    @Override
+    public String getOwner() {
+        return owner;
+    }
 
-	public void setClaimedDate(Date claimedDate) {
-		this.claimedDate = claimedDate;
-	}
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 
-	@Override
-	public String getOwner() {
-		return owner;
-	}
+    public void setLastModifiedFrom(Date lastModifiedFrom) {
+        this.lastModifiedFrom = lastModifiedFrom;
+    }
 
-	public void setOwner(String owner) {
-		this.owner = owner;
-	}
+    public ProcessInstance getProcessInstance() {
+        return this.processInstance;
+    }
 
-	public void setLastModifiedFrom(Date lastModifiedFrom) {
-		this.lastModifiedFrom = lastModifiedFrom;
-	}
+    public void setProcessInstance(ProcessInstance processInstance) {
+        this.processInstance = processInstance;
+    }
 
-	/**
-	 * @return the processInstance
-	 */
-	public ProcessInstance getProcessInstance() {
-		return this.processInstance;
-	}
+    public Map<String, Set<Variable>> getVariables() {
+        return this.variables;
+    }
 
-	/**
-	 * @param processInstance the processInstance to set
-	 */
-	public void setProcessInstance(ProcessInstance processInstance) {
-		this.processInstance = processInstance;
-	}
+    public void setVariables(Map<String, Set<Variable>> variables) {
+        this.variables = variables;
+    }
 
-	/**
-	 * @return the variableEntities
-	 */
-	public Map<String, Set<Variable>> getVariables() {
-		return this.variables;
-	}
+    @Override
+    public String getParentTaskId() {
+        return parentTaskId;
+    }
 
-	/**
-	 * @param variables the variableEntities to set
-	 */
-	public void setVariables(Map<String, Set<Variable>> variables) {
-		this.variables = variables;
-	}
-
-//	/**
-//	 * @return the taskCandidateUsers
-//	 */
-//	public Set<TaskCandidateUser> getTaskCandidateUsers() {
-//		return this.taskCandidateUsers;
-//	}
-//
-//	/**
-//	 * @param taskCandidateUsers the taskCandidateUsers to set
-//	 */
-//	public void setTaskCandidateUsers(Set<TaskCandidateUser> taskCandidateUsers) {
-//		this.taskCandidateUsers = taskCandidateUsers;
-//	}
-//
-//	/**
-//	 * @return the taskCandidateUsers
-//	 */
-//	public Set<TaskCandidateGroup> getTaskCandidateGroups() {
-//		return this.taskCandidateGroups;
-//	}
-//
-//	/**
-//	 * @param taskCandidateGroups the taskCandidateGroups to set
-//	 */
-//	public void setTaskCandidateGroups(Set<TaskCandidateGroup> taskCandidateGroups) {
-//		this.taskCandidateGroups = taskCandidateGroups;
-//	}
-
-	@Override
-	public String getParentTaskId() {
-		return parentTaskId;
-	}
-
-	public void setParentTaskId(String parentTaskId) {
-		this.parentTaskId = parentTaskId;
-	}
+    public void setParentTaskId(String parentTaskId) {
+        this.parentTaskId = parentTaskId;
+    }
 }

@@ -33,33 +33,33 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProcessStartedEventHandler implements QueryEventHandler {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ProcessStartedEventHandler.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ProcessStartedEventHandler.class);
 
-	private ProcessInstanceRepository processInstanceRepository;
+    private ProcessInstanceRepository processInstanceRepository;
 
-	@Autowired
-	public ProcessStartedEventHandler(ProcessInstanceRepository processInstanceRepository) {
-		this.processInstanceRepository = processInstanceRepository;
-	}
+    @Autowired
+    public ProcessStartedEventHandler(ProcessInstanceRepository processInstanceRepository) {
+        this.processInstanceRepository = processInstanceRepository;
+    }
 
-	@Override
-	public void handle(CloudRuntimeEvent<?, ?> event) {
-		CloudProcessStartedEvent startedEvent = (CloudProcessStartedEvent) event;
-		String processInstanceId = startedEvent.getEntity().getId();
-		LOGGER.debug("Handling start of process Instance " + processInstanceId);
+    @Override
+    public void handle(CloudRuntimeEvent<?, ?> event) {
+        CloudProcessStartedEvent startedEvent = (CloudProcessStartedEvent) event;
+        String processInstanceId = startedEvent.getEntity().getId();
+        LOGGER.debug("Handling process started Instance " + processInstanceId);
 
-		Optional<ProcessInstance> findResult = processInstanceRepository.findById(processInstanceId);
-		ProcessInstance processInstanceEntity = findResult.orElseThrow(
-				() -> new QueryException("Unable to find process instance with the given id: " + processInstanceId));
-		if (ProcessInstance.ProcessInstanceStatus.CREATED.equals(processInstanceEntity.getStatus())) {
-			processInstanceEntity.setStatus(ProcessInstance.ProcessInstanceStatus.RUNNING);
-			processInstanceEntity.setLastModified(new Date(startedEvent.getTimestamp()));
-			processInstanceRepository.save(processInstanceEntity);
-		}
-	}
+        Optional<ProcessInstance> findResult = processInstanceRepository.findById(processInstanceId);
+        ProcessInstance processInstanceEntity = findResult.orElseThrow(
+                () -> new QueryException("Unable to find process instance with the given id: " + processInstanceId));
+        if (ProcessInstance.ProcessInstanceStatus.CREATED.equals(processInstanceEntity.getStatus())) {
+            processInstanceEntity.setStatus(ProcessInstance.ProcessInstanceStatus.RUNNING);
+            processInstanceEntity.setLastModified(new Date(startedEvent.getTimestamp()));
+            processInstanceRepository.save(processInstanceEntity);
+        }
+    }
 
-	@Override
-	public String getHandledEvent() {
-		return ProcessRuntimeEvent.ProcessEvents.PROCESS_STARTED.name();
-	}
+    @Override
+    public String getHandledEvent() {
+        return ProcessRuntimeEvent.ProcessEvents.PROCESS_STARTED.name();
+    }
 }

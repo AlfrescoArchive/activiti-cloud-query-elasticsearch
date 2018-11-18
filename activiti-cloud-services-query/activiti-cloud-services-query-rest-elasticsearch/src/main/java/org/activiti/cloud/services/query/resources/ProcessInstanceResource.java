@@ -22,9 +22,7 @@ import org.springframework.hateoas.Resource;
 
 public class ProcessInstanceResource extends Resource<CloudProcessInstance> {
 
-    public ProcessInstanceResource(CloudProcessInstance content,
-                                   Link... links) {
-        super(content,
-              links);
+    public ProcessInstanceResource(CloudProcessInstance content, Link... links) {
+        super(content, links);
     }
 }
